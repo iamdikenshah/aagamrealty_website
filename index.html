@@ -3,11 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Aagam Realty — Your trusted partner in real estate. Rent, owned properties, pre-lease, and land/plots. 4+ years of trusted expertise." />
-  <title>Aagam Realty — Your Trusted Partner in Real Estate</title>
 
+  <!-- ===================== PRIMARY SEO ===================== -->
+  <title>Aagam Realty — Real Estate Agent in Ahmedabad | Rent, Buy &amp; Pre-Lease</title>
+  <meta name="description" content="Aagam Realty is a trusted real estate agent in Ahmedabad with 4+ years of expertise. Rent, buy, pre-lease properties and plots in Bopal, SG Highway, Satellite, Thaltej &amp; more. Honest, transparent guidance." />
+  <meta name="keywords" content="real estate agent Ahmedabad, property in Ahmedabad, flats for rent Bopal, buy property SG Highway, pre-lease property Ahmedabad, plots in Ahmedabad, 2 BHK 3 BHK Ahmedabad, Aagam Realty" />
+  <meta name="author" content="Aagam Realty" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="canonical" href="https://aagamrealty.com/" />
+
+  <!-- Geo / Local SEO -->
+  <meta name="geo.region" content="IN-GJ" />
+  <meta name="geo.placename" content="Ahmedabad, Gujarat, India" />
+
+  <!-- ===================== OPEN GRAPH (Facebook / WhatsApp / LinkedIn) ===================== -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Aagam Realty" />
+  <meta property="og:title" content="Aagam Realty — Real Estate Agent in Ahmedabad | Rent, Buy &amp; Pre-Lease" />
+  <meta property="og:description" content="Trusted real estate agent in Ahmedabad. Rent, buy, pre-lease properties and plots with 4+ years of transparent, client-first expertise." />
+  <meta property="og:url" content="https://aagamrealty.com/" />
+  <meta property="og:image" content="https://aagamrealty.com/images/hero-bg.jpg" />
+  <meta property="og:image:alt" content="Aagam Realty — Your trusted partner in real estate" />
+  <meta property="og:locale" content="en_IN" />
+
+  <!-- ===================== TWITTER CARD ===================== -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Aagam Realty — Real Estate Agent in Ahmedabad" />
+  <meta name="twitter:description" content="Rent, buy, pre-lease properties and plots in Ahmedabad with 4+ years of trusted, transparent expertise." />
+  <meta name="twitter:image" content="https://aagamrealty.com/images/hero-bg.jpg" />
+
+  <meta name="theme-color" content="#0a1f44" />
   <link rel="icon" href="images/favicon.ico" type="image/x-icon">
-  
+  <link rel="apple-touch-icon" href="images/app_header_logo.png" />
+
   <!-- Google Fonts: Open Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,6 +46,62 @@
 
   <!-- Site styles -->
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- ===================== STRUCTURED DATA (JSON-LD) ===================== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "@id": "https://aagamrealty.com/#organization",
+    "name": "Aagam Realty",
+    "description": "Trusted real estate agent in Ahmedabad offering rentals, owned properties, pre-lease investments, and land/plots with 4+ years of transparent, client-first expertise.",
+    "url": "https://aagamrealty.com/",
+    "logo": "https://aagamrealty.com/images/app_header_logo.png",
+    "image": "https://aagamrealty.com/images/hero-bg.jpg",
+    "telephone": "+91-92271-00299",
+    "email": "info@aagamrealty.com",
+    "priceRange": "₹₹",
+    "foundingDate": "2022",
+    "areaServed": { "@type": "City", "name": "Ahmedabad" },
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Ahmedabad",
+      "addressRegion": "Gujarat",
+      "addressCountry": "IN"
+    },
+    "sameAs": [
+      "https://www.instagram.com/aagam.realty/",
+      "https://www.facebook.com/share/1GfvHx7MFz/"
+    ],
+    "knowsAbout": ["Property Rentals", "Property Sales", "Pre-Lease Investments", "Land and Plots"],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5",
+      "reviewCount": "6",
+      "bestRating": "5"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Real Estate Services",
+      "itemListElement": [
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Rent", "description": "Residential and commercial rental properties tailored to your needs and budget." } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Owned Properties", "description": "End-to-end assistance buying property, from search to registration." } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Pre-Lease", "description": "Pre-leased commercial properties with assured rental income and long-term value." } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Land / Plots", "description": "Residential and commercial plots in prime locations with verified titles." } }
+      ]
+    }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "url": "https://aagamrealty.com/",
+    "name": "Aagam Realty",
+    "publisher": { "@id": "https://aagamrealty.com/#organization" }
+  }
+  </script>
 </head>
 <body>
 
@@ -317,8 +401,8 @@
             <label for="requirement">Property Requirement Type <span aria-hidden="true">*</span></label>
             <select id="requirement" name="requirement" required>
               <option value="" disabled selected>Select requirement</option>
-              <option value="Rent">Rent</option>
               <option value="Buy">Buy</option>
+              <option value="Rent">Rent</option>
               <option value="Pre-Lease">Pre-Lease</option>
             </select>
           </div>
@@ -356,8 +440,6 @@
               <label class="ms-option"><input type="checkbox" name="locations" value="Thaltej" /> <span>Thaltej</span></label>
               <label class="ms-option"><input type="checkbox" name="locations" value="Shela" /> <span>Shela</span></label>
               <label class="ms-option"><input type="checkbox" name="locations" value="Gota" /> <span>Gota</span></label>
-              <label class="ms-option"><input type="checkbox" name="locations" value="Chandkheda" /> <span>Chandkheda</span></label>
-              <label class="ms-option"><input type="checkbox" name="locations" value="Maninagar" /> <span>Maninagar</span></label>
               <label class="ms-option"><input type="checkbox" name="locations" value="Other" /> <span>Other</span></label>
             </div>
           </div>
