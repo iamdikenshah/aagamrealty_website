@@ -13,6 +13,17 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
+  /* ---------- Logo -> scroll to top with clean URL ---------- */
+  var logo = document.querySelector(".logo");
+  if (logo) {
+    logo.addEventListener("click", function (e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Remove the "#home" hash without adding a history entry
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    });
+  }
+
   /* ---------- Hamburger / mobile menu ---------- */
   var hamburger = document.getElementById("hamburger");
   var mobileMenu = document.getElementById("mobileMenu");
