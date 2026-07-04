@@ -1,388 +1,432 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aagam Realty — Your Trusted Property Partner in Ahmedabad</title>
-<meta name="description" content="Aagam Realty — residential and commercial real estate brokerage in Ahmedabad. Flats, villas, land plots, pre-lease and PG properties.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Aagam Realty — Your trusted partner in real estate. Rent, owned properties, pre-lease, and land/plots. 4+ years of trusted expertise." />
+  <title>Aagam Realty — Your Trusted Partner in Real Estate</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  
+  <!-- Google Fonts: Open Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<!-- ===== NAVBAR ===== -->
-<nav class="navbar" id="navbar">
-  <a href="#home" class="logo">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#51A6DC" stroke-width="2">
-      <path d="M3 11.5 12 4l9 7.5" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    Aagam Realty
-  </a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="#home" class="nav-link">Home</a></li>
-    <li><a href="#properties" class="nav-link">Properties</a></li>
-    <li><a href="#why-us" class="nav-link">Why Us</a></li>
-    <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
-    <li><a href="#contact" class="nav-link nav-cta">Contact</a></li>
-  </ul>
-  <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
+  <!-- ===================== NAVBAR ===================== -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="#home" class="logo" aria-label="Aagam Realty home">
+        <img src="images/app_header_logo.png" alt="Aagam Realty" class="logo-img" />
+      </a>
 
-<!-- ===== HERO ===== -->
-<section class="hero" id="home">
-  <div class="hero-grid">
-    <div class="hero-content fade-up visible">
-      <span class="hero-tag">Your Trusted Property Partner</span>
-      <h1>Find Your Perfect <em>Home</em> in Ahmedabad</h1>
-      <p>Renting or Buying — We help you discover flats, villas, land plots, pre-lease &amp; PG properties with zero hassle.</p>
-      <div class="hero-ctas">
-        <a href="#properties" class="btn btn-gold">Explore Properties →</a>
-        <a href="#contact" class="btn btn-outline">Contact Us</a>
-      </div>
-      <div class="hero-stats-row">
-        <div><h4>500+</h4><span>Listings</span></div>
-        <div><h4>8+ Yrs</h4><span>Experience</span></div>
-        <div><h4>1200+</h4><span>Happy Clients</span></div>
-      </div>
-    </div>
-  </div>
-  <a href="#properties" class="scroll-down" aria-label="Scroll down">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="2">
-      <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </a>
-</section>
+      <nav aria-label="Primary">
+        <ul class="nav-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#testimonials">Testimonials</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
 
-<!-- ===== PROPERTIES ===== -->
-<section id="properties">
-  <div class="container">
-    <div class="section-head">
-      <div>
-        <span class="eyebrow fade-up">What We Offer</span>
-        <h2 class="section-title fade-up">Properties We Deal In</h2>
+      <div class="nav-cta">
+        <a href="#contact" class="btn btn-primary">Get in Touch</a>
       </div>
-      <p class="section-subtitle fade-up">From cozy flats to commercial investments — explore the wide range of properties we specialize in.</p>
+
+      <button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobileMenu">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
     </div>
 
-    <div class="property-grid">
-      <article class="property-card fade-up" style="background-image:url('images/property-flats.jpg')">
-        <span class="tag">Most Popular</span>
-        <div class="property-card-body">
-          <span class="property-card-icon">🏠</span>
-          <h3>Residential Flats</h3>
-          <p>2BHK &amp; 3BHK flats available for rent and purchase across prime Ahmedabad locations.</p>
+    <!-- Mobile dropdown --> 
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile">
+      <a href="#home">Home</a>
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="#contact">Contact</a>
+      <a href="#contact" class="btn btn-primary">Get in Touch</a>
+    </nav>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <span class="hero-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> 4+ Years of Trusted Expertise</span>
+      <h1>Your Trusted Partner in Real Estate</h1>
+      <p class="sub">Helping you find the perfect property — whether it's for rent, purchase, pre-lease, or a plot of land. 4+ years of trusted expertise in the real estate market.</p>
+      <div class="hero-cta">
+        <a href="#services" class="btn btn-primary">Explore Properties</a>
+        <a href="#contact" class="btn btn-white-outline">Contact Us</a>
+      </div>
+    </div>
+    <a href="#services" class="scroll-indicator" aria-label="Scroll to services">
+      <span>Scroll</span>
+      <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+    </a>
+  </section>
+
+  <!-- ===================== SERVICES ===================== -->
+  <section class="services" id="services">
+    <div class="container">
+      <h2 class="section-heading reveal">What We Deal In</h2>
+      <p class="section-subheading reveal">From cozy rentals to prime plots, we cover every corner of the property market with expert guidance at every step.</p>
+
+      <div class="services-grid">
+        <article class="service-card reveal">
+          <div class="service-icon"><i class="fa-solid fa-key" aria-hidden="true"></i></div>
+          <h3>Rent</h3>
+          <p>Find your ideal rental property. Residential and commercial spaces tailored to your needs and budget.</p>
+        </article>
+
+        <article class="service-card reveal">
+          <div class="service-icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
+          <h3>Owned Properties</h3>
+          <p>Buy your dream property with confidence. End-to-end assistance from search to registration.</p>
+        </article>
+
+        <article class="service-card reveal">
+          <div class="service-icon"><i class="fa-solid fa-building" aria-hidden="true"></i></div>
+          <h3>Pre-Lease</h3>
+          <p>Invest in pre-leased commercial properties with assured rental income and long-term value.</p>
+        </article>
+
+        <article class="service-card reveal">
+          <div class="service-icon"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i></div>
+          <h3>Land / Plots</h3>
+          <p>Explore residential and commercial plots in prime locations. Verified titles, clear documentation.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== STATISTICS ===================== -->
+  <section class="stats" id="stats" aria-label="Our track record">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat reveal">
+          <div class="stat-number" data-target="150" data-suffix="+">0</div>
+          <div class="stat-label">Properties Sold &amp; Rented</div>
         </div>
-      </article>
-      <article class="property-card fade-up" style="background-image:url('images/property-villa.jpg')">
-        <div class="property-card-body">
-          <span class="property-card-icon">🏡</span>
-          <h3>Villas</h3>
-          <p>Spacious independent villas for families seeking comfort and privacy.</p>
+        <div class="stat reveal">
+          <div class="stat-number" data-target="4" data-suffix="+">0</div>
+          <div class="stat-label">Years of Experience</div>
         </div>
-      </article>
-      <article class="property-card fade-up" style="background-image:url('images/property-land.jpg')">
-        <div class="property-card-body">
-          <span class="property-card-icon">🌿</span>
-          <h3>Land Plots</h3>
-          <p>Invest in the future — residential and commercial land plots across growing zones.</p>
+        <div class="stat reveal">
+          <div class="stat-number" data-target="200" data-suffix="+">0</div>
+          <div class="stat-label">Happy Clients</div>
         </div>
-      </article>
-      <article class="property-card fade-up" style="background-image:url('images/property-prelease.jpg')">
-        <span class="tag">High Yield</span>
-        <div class="property-card-body">
-          <span class="property-card-icon">🏢</span>
-          <h3>Pre-Lease Properties</h3>
-          <p>Ready-to-move commercial spaces with existing tenants — ideal for investors.</p>
+        <div class="stat reveal">
+          <div class="stat-number" data-target="50" data-suffix="+">0</div>
+          <div class="stat-label">Ongoing Listings</div>
         </div>
-      </article>
-      <article class="property-card fade-up" style="background-image:url('images/property-pg.jpg')">
-        <div class="property-card-body">
-          <span class="property-card-icon">🛏️</span>
-          <h3>PG Accommodation</h3>
-          <p>Safe, affordable PG options for students and working professionals.</p>
-        </div>
-      </article>
-      <article class="property-card fade-up" style="background-image:url('images/property-rental.jpg')">
-        <div class="property-card-body">
-          <span class="property-card-icon">🔑</span>
-          <h3>Rental Properties</h3>
-          <p>Wide range of rental options — from budget-friendly to premium homes.</p>
-        </div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ===== WHY US ===== -->
-<section id="why-us">
-  <div class="container">
-    <div class="section-head">
-      <div>
-        <span class="eyebrow fade-up">The Aagam Difference</span>
-        <h2 class="section-title fade-up">Why Choose Us</h2>
-      </div>
-      <p class="section-subtitle fade-up">Numbers and principles that reflect the trust thousands of clients have placed in us.</p>
-    </div>
-
-    <div class="stats-strip fade-up">
-      <div class="stat-item">
-        <h3>500+</h3>
-        <p>Properties Listed</p>
-      </div>
-      <div class="stat-item">
-        <h3>8+</h3>
-        <p>Years of Experience</p>
-      </div>
-      <div class="stat-item">
-        <h3>1200+</h3>
-        <p>Happy Clients</p>
-      </div>
-      <div class="stat-item">
-        <h3>24h</h3>
-        <p>Avg. Response Time</p>
       </div>
     </div>
+  </section>
 
-    <div class="feature-grid">
-      <div class="feature-card fade-up">
-        <div class="benefit-icon">💎</div>
-        <h4>Zero Brokerage Surprises</h4>
-        <p>Transparent pricing, no hidden fees — what we quote is what you pay.</p>
-      </div>
-      <div class="feature-card fade-up">
-        <div class="benefit-icon">🤝</div>
-        <h4>End-to-End Support</h4>
-        <p>From site visits to paperwork, we handle it all so you don't have to.</p>
-      </div>
-      <div class="feature-card fade-up">
-        <div class="benefit-icon">📍</div>
-        <h4>Local Expertise</h4>
-        <p>Deep knowledge of Ahmedabad's real estate market and emerging zones — Bopal, SG Highway, Satellite and beyond.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== TESTIMONIALS ===== -->
-<section id="testimonials">
-  <div class="container">
-    <div class="center" style="max-width:640px;margin:0 auto 56px;">
-      <span class="eyebrow fade-up">Client Stories</span>
-      <h2 class="section-title fade-up">What Our Clients Say</h2>
-      <p class="section-subtitle fade-up">Real stories from people who found their perfect property with us.</p>
+  <!-- ===================== TESTIMONIALS ===================== -->
+  <section class="testimonials" id="testimonials">
+    <div class="container">
+      <h2 class="section-heading reveal">What Our Clients Say</h2>
+      <p class="section-subheading reveal">Real experiences from families and investors who found their perfect match with Aagam Realty.</p>
     </div>
 
-    <div class="marquee-viewport fade-up">
-      <div class="testimonial-track">
+    <div class="marquee" id="marquee">
+      <div class="marquee-track" id="marqueeTrack">
+        <!-- Set 1 -->
         <article class="testimonial-card">
-          <div class="quote-mark">"</div>
-          <div class="stars">★★★★★</div>
-          <p class="quote">Aagam Realty helped us find our dream 3BHK in just 2 weeks. Very professional and transparent.</p>
-          <div class="client-row">
-            <div class="avatar">RM</div>
-            <p class="client">Raj Mehta<span>Bopal</span></p>
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"Aagam Realty made buying our first home completely stress-free. Every document was verified and explained clearly. Highly recommended!"</p>
+          <div class="testimonial-author">
+            <span class="name">Rohan Mehta</span>
+            <span class="role">Property Buyer</span>
+            <span class="stars" aria-label="5 out of 5 stars">★★★★★</span>
           </div>
         </article>
+
         <article class="testimonial-card">
-          <div class="quote-mark">"</div>
-          <div class="stars">★★★★★</div>
-          <p class="quote">I was looking for a pre-lease commercial property and they delivered exactly what I needed.</p>
-          <div class="client-row">
-            <div class="avatar">PS</div>
-            <p class="client">Priya Shah<span>SG Highway</span></p>
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"Found a 2BHK rental within my budget in just a week. The whole process was smooth and completely transparent. Thank you so much!"</p>
+          <div class="testimonial-author">
+            <span class="name">Priya Sharma</span>
+            <span class="role">Tenant</span>
+            <span class="stars" aria-label="5 out of 5 stars">★★★★★</span>
           </div>
         </article>
+
         <article class="testimonial-card">
-          <div class="quote-mark">"</div>
-          <div class="stars">★★★★★</div>
-          <p class="quote">Found a great PG through Aagam. The team was super helpful and quick to respond on WhatsApp.</p>
-          <div class="client-row">
-            <div class="avatar">AP</div>
-            <p class="client">Arjun Patel<span>Satellite</span></p>
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"I invested in a pre-leased office space and the returns have been exactly as promised. Professional, honest, and reliable service."</p>
+          <div class="testimonial-author">
+            <span class="name">Anil Deshmukh</span>
+            <span class="role">Investor</span>
+            <span class="stars" aria-label="5 out of 5 stars">★★★★★</span>
           </div>
         </article>
-        <!-- duplicate set for seamless marquee loop -->
-        <article class="testimonial-card" aria-hidden="true">
-          <div class="quote-mark">"</div>
-          <div class="stars">★★★★★</div>
-          <p class="quote">Aagam Realty helped us find our dream 3BHK in just 2 weeks. Very professional and transparent.</p>
-          <div class="client-row">
-            <div class="avatar">RM</div>
-            <p class="client">Raj Mehta<span>Bopal</span></p>
+
+        <article class="testimonial-card">
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"Bought a residential plot with clear title and zero hassles. Their documentation support saved me weeks of running around. Excellent!"</p>
+          <div class="testimonial-author">
+            <span class="name">Sneha Patel</span>
+            <span class="role">Plot Owner</span>
+            <span class="stars" aria-label="5 out of 5 stars">★★★★★</span>
           </div>
         </article>
-        <article class="testimonial-card" aria-hidden="true">
-          <div class="quote-mark">"</div>
-          <div class="stars">★★★★★</div>
-          <p class="quote">I was looking for a pre-lease commercial property and they delivered exactly what I needed.</p>
-          <div class="client-row">
-            <div class="avatar">PS</div>
-            <p class="client">Priya Shah<span>SG Highway</span></p>
+
+        <article class="testimonial-card">
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"Genuine guidance and no hidden charges. They understood exactly what my family needed and delivered beyond expectations."</p>
+          <div class="testimonial-author">
+            <span class="name">Vikram Nair</span>
+            <span class="role">Home Buyer</span>
+            <span class="stars" aria-label="5 out of 5 stars">★★★★★</span>
           </div>
         </article>
+
+        <article class="testimonial-card">
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"As an NRI, I was worried about renting out my flat. Aagam Realty handled everything end-to-end. Truly a client-first approach!"</p>
+          <div class="testimonial-author">
+            <span class="name">Meera Iyer</span>
+            <span class="role">Property Owner</span>
+            <span class="stars" aria-label="5 out of 5 stars">★★★★★</span>
+          </div>
+        </article>
+
+        <!-- Set 2 (duplicate for seamless loop) -->
         <article class="testimonial-card" aria-hidden="true">
-          <div class="quote-mark">"</div>
-          <div class="stars">★★★★★</div>
-          <p class="quote">Found a great PG through Aagam. The team was super helpful and quick to respond on WhatsApp.</p>
-          <div class="client-row">
-            <div class="avatar">AP</div>
-            <p class="client">Arjun Patel<span>Satellite</span></p>
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"Aagam Realty made buying our first home completely stress-free. Every document was verified and explained clearly. Highly recommended!"</p>
+          <div class="testimonial-author">
+            <span class="name">Rohan Mehta</span>
+            <span class="role">Property Buyer</span>
+            <span class="stars">★★★★★</span>
+          </div>
+        </article>
+
+        <article class="testimonial-card" aria-hidden="true">
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"Found a 2BHK rental within my budget in just a week. The whole process was smooth and completely transparent. Thank you so much!"</p>
+          <div class="testimonial-author">
+            <span class="name">Priya Sharma</span>
+            <span class="role">Tenant</span>
+            <span class="stars">★★★★★</span>
+          </div>
+        </article>
+
+        <article class="testimonial-card" aria-hidden="true">
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"I invested in a pre-leased office space and the returns have been exactly as promised. Professional, honest, and reliable service."</p>
+          <div class="testimonial-author">
+            <span class="name">Anil Deshmukh</span>
+            <span class="role">Investor</span>
+            <span class="stars">★★★★★</span>
+          </div>
+        </article>
+
+        <article class="testimonial-card" aria-hidden="true">
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"Bought a residential plot with clear title and zero hassles. Their documentation support saved me weeks of running around. Excellent!"</p>
+          <div class="testimonial-author">
+            <span class="name">Sneha Patel</span>
+            <span class="role">Plot Owner</span>
+            <span class="stars">★★★★★</span>
+          </div>
+        </article>
+
+        <article class="testimonial-card" aria-hidden="true">
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"Genuine guidance and no hidden charges. They understood exactly what my family needed and delivered beyond expectations."</p>
+          <div class="testimonial-author">
+            <span class="name">Vikram Nair</span>
+            <span class="role">Home Buyer</span>
+            <span class="stars">★★★★★</span>
+          </div>
+        </article>
+
+        <article class="testimonial-card" aria-hidden="true">
+          <i class="fa-solid fa-quote-left quote-icon" aria-hidden="true"></i>
+          <p class="testimonial-text">"As an NRI, I was worried about renting out my flat. Aagam Realty handled everything end-to-end. Truly a client-first approach!"</p>
+          <div class="testimonial-author">
+            <span class="name">Meera Iyer</span>
+            <span class="role">Property Owner</span>
+            <span class="stars">★★★★★</span>
           </div>
         </article>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ===== CONTACT ===== -->
-<section id="contact">
-  <div class="container">
-    <div class="section-head">
-      <div>
-        <span class="eyebrow fade-up">Let's Talk</span>
-        <h2 class="section-title fade-up">Get In Touch</h2>
+  <!-- ===================== ABOUT ===================== -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <h2>About Aagam Realty</h2>
+          <p>Aagam Realty was founded with a simple yet powerful vision — to <strong>simplify real estate</strong> for everyone. What began as one individual's passion for helping people find the right home has grown into a trusted name built on relationships, not just transactions.</p>
+          <p>With <strong>4+ years of hands-on experience</strong> in the field, we specialize in <strong>rentals, owned properties, pre-lease investments, and land &amp; plots</strong>. Whether you're a first-time renter, a growing family, or a seasoned investor, we bring the same dedication to every deal.</p>
+          <p>Our foundation rests on <strong>transparency, trust, and genuine client satisfaction</strong>. No hidden charges, no jargon, no pressure — just honest advice and properties that truly fit your needs.</p>
+        </div>
+
+        <aside class="vision-box reveal">
+          <div class="vision-icon"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></div>
+          <h3>Our Vision</h3>
+          <p>To make every property dealing <strong>stress-free, transparent, and accessible</strong> for everyone. We believe finding the right space should feel exciting — not overwhelming. Our goal is to guide each client with clarity and care, turning big decisions into confident moves.</p>
+        </aside>
       </div>
-      <p class="section-subtitle fade-up">Tell us what you're looking for and we'll reach out within 24 hours.</p>
+
+      <div class="value-pills reveal">
+        <span class="pill"><i class="fa-solid fa-award" aria-hidden="true"></i> Trusted Expertise</span>
+        <span class="pill"><i class="fa-solid fa-handshake" aria-hidden="true"></i> Transparent Deals</span>
+        <span class="pill"><i class="fa-solid fa-user-check" aria-hidden="true"></i> Client-First Approach</span>
+      </div>
     </div>
+  </section>
 
-    <div class="contact-grid">
-      <div class="contact-visual-wrap fade-up">
-        <div class="contact-visual">
-          <span class="contact-badge">📞 We reply within 24h</span>
-          <h3>We make property hunting simple, fast &amp; trustworthy.</h3>
+  <!-- ===================== ENQUIRY FORM ===================== -->
+  <section class="enquiry" id="contact">
+    <div class="container">
+      <h2 class="section-heading reveal">Send Us an Enquiry</h2>
+      <p class="section-subheading reveal">Tell us what you're looking for and we'll get back to you on WhatsApp.</p>
+
+      <form class="enquiry-form reveal" id="enquiryForm" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fullName">Full Name <span aria-hidden="true">*</span></label>
+            <input type="text" id="fullName" name="fullName" placeholder="e.g. Rohan Mehta" required autocomplete="name" />
+          </div>
+          <div class="form-group">
+            <label for="whatsapp">WhatsApp Number <span aria-hidden="true">*</span></label>
+            <input type="tel" id="whatsapp" name="whatsapp" placeholder="e.g. 98765 43210" required
+                   pattern="[0-9+\s-]{10,15}" inputmode="numeric" autocomplete="tel" />
+          </div>
         </div>
-      </div>
 
-      <form class="contact-form fade-up" id="enquiryForm" novalidate>
-        <div class="form-group">
-          <label for="fullName">Full Name</label>
-          <input type="text" id="fullName" name="fullName" required aria-describedby="fullNameError">
-          <span class="field-error" id="fullNameError"></span>
-        </div>
-
-        <div class="form-group">
-          <label for="whatsapp">WhatsApp Number</label>
-          <input type="tel" id="whatsapp" name="whatsapp" placeholder="+91 XXXXX XXXXX" required aria-describedby="whatsappError">
-          <span class="field-error" id="whatsappError"></span>
-        </div>
-
-        <div class="form-group">
-          <label>I'm looking to:</label>
-          <div class="radio-group">
-            <label class="radio-option">
-              <input type="radio" name="lookingTo" value="Rent a Property" checked>
-              🏠 Rent a Property
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="lookingTo" value="Buy a Property">
-              🔑 Buy a Property
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="lookingTo" value="Sell / List My Property">
-              💰 Sell / List My Property
-            </label>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="requirement">Property Requirement Type <span aria-hidden="true">*</span></label>
+            <select id="requirement" name="requirement" required>
+              <option value="" disabled selected>Select requirement</option>
+              <option value="Rent">Rent</option>
+              <option value="Buy">Buy</option>
+              <option value="Pre-Lease">Pre-Lease</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="propertyType">Property Type <span aria-hidden="true">*</span></label>
+            <select id="propertyType" name="propertyType" required>
+              <option value="" disabled selected>Select property type</option>
+              <option value="2 BHK">2 BHK</option>
+              <option value="3 BHK">3 BHK</option>
+              <option value="4 BHK">4 BHK</option>
+              <option value="Luxury Flat">Luxury Flat</option>
+              <option value="Villa">Villa</option>
+              <option value="Bungalow">Bungalow</option>
+              <option value="Plot">Plot</option>
+              <option value="Pre-Lease Property">Pre-Lease Property</option>
+            </select>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="propertyType">Property Type</label>
-          <select id="propertyType" name="propertyType" required>
-            <option value="" disabled selected>Select Property Type</option>
-            <option value="2BHK Flat">2BHK Flat</option>
-            <option value="3BHK Flat">3BHK Flat</option>
-            <option value="Villa">Villa</option>
-            <option value="Land Plot">Land Plot</option>
-            <option value="Pre-Lease Property">Pre-Lease Property</option>
-            <option value="PG Accommodation">PG Accommodation</option>
-            <option value="Other">Other</option>
-          </select>
-          <span class="field-error" id="propertyTypeError"></span>
+          <span class="group-label" id="locationLabel">Preferred Property Location <span aria-hidden="true">*</span></span>
+          <div class="multiselect" id="locationGroup">
+            <button type="button" class="multiselect-trigger" id="locationTrigger"
+                    aria-haspopup="listbox" aria-expanded="false" aria-labelledby="locationLabel">
+              <span class="multiselect-value placeholder" id="locationValue">Select location(s)</span>
+              <i class="fa-solid fa-chevron-down multiselect-caret" aria-hidden="true"></i>
+            </button>
+            <div class="multiselect-panel" id="locationPanel" role="listbox" aria-multiselectable="true">
+              <label class="ms-option"><input type="checkbox" name="locations" value="Bopal" /> <span>Bopal</span></label>
+              <label class="ms-option"><input type="checkbox" name="locations" value="South Bopal" /> <span>South Bopal</span></label>
+              <label class="ms-option"><input type="checkbox" name="locations" value="SG Highway" /> <span>SG Highway</span></label>
+              <label class="ms-option"><input type="checkbox" name="locations" value="Satellite" /> <span>Satellite</span></label>
+              <label class="ms-option"><input type="checkbox" name="locations" value="Prahlad Nagar" /> <span>Prahlad Nagar</span></label>
+              <label class="ms-option"><input type="checkbox" name="locations" value="Bodakdev" /> <span>Bodakdev</span></label>
+              <label class="ms-option"><input type="checkbox" name="locations" value="Thaltej" /> <span>Thaltej</span></label>
+              <label class="ms-option"><input type="checkbox" name="locations" value="Shela" /> <span>Shela</span></label>
+              <label class="ms-option"><input type="checkbox" name="locations" value="Gota" /> <span>Gota</span></label>
+              <label class="ms-option"><input type="checkbox" name="locations" value="Chandkheda" /> <span>Chandkheda</span></label>
+              <label class="ms-option"><input type="checkbox" name="locations" value="Maninagar" /> <span>Maninagar</span></label>
+              <label class="ms-option"><input type="checkbox" name="locations" value="Other" /> <span>Other</span></label>
+            </div>
+          </div>
+          <small class="field-hint">Select one or more preferred areas.</small>
         </div>
 
         <div class="form-group">
-          <label for="message">Message / Requirements</label>
-          <textarea id="message" name="message" placeholder="Describe your budget, preferred location, timeline, or any specific requirements..."></textarea>
+          <label for="details">Additional Details</label>
+          <textarea id="details" name="details" rows="4"
+                    placeholder="Tell us more — budget, specific society/area, amenities, timeline, etc."></textarea>
         </div>
 
-        <button type="submit" class="submit-btn" aria-label="Send my enquiry">Send My Enquiry →</button>
+        <button type="submit" class="btn btn-primary" id="enquirySubmit">
+          <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Send Enquiry
+        </button>
+
+        <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
       </form>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ===== FOOTER ===== -->
-<footer>
-  <div class="footer-grid">
-    <div class="footer-brand">
-      <a href="#home" class="logo">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#51A6DC" stroke-width="2">
-          <path d="M3 11.5 12 4l9 7.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Aagam Realty
-      </a>
-      <p>Your trusted partner in finding the perfect property.</p>
-    </div>
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="images/app_logo_footer.png" alt="Aagam Realty" class="footer-logo-img" />
+          <p>Your trusted real estate partner — helping you rent, buy, invest, and build with confidence.</p>
+          <p>&copy; 2026 Aagam Realty</p>
+        </div>
 
-    <div>
-      <h4>Quick Links</h4>
-      <ul class="footer-links">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#properties">Properties</a></li>
-        <li><a href="#why-us">Why Us</a></li>
-        <li><a href="#testimonials">Testimonials</a></li>
-        <li><a href="#contact">Contact Us</a></li>
-      </ul>
-    </div>
+        <div>
+          <h4>Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#testimonials">Testimonials</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
 
-    <div>
-      <h4>Follow Us</h4>
-      <div class="social-icons">
-        <!-- TODO: Replace with actual Facebook page link -->
-        <a href="https://facebook.com/aagamrealty" target="_blank" rel="noopener" aria-label="Facebook">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9h3V6h-3a4 4 0 0 0-4 4v2H7v3h3v6h3v-6h3l1-3h-4v-2a1 1 0 0 1 1-1Z"/></svg>
-        </a>
-        <!-- TODO: Replace with actual Instagram profile link -->
-        <a href="https://instagram.com/aagamrealty" target="_blank" rel="noopener" aria-label="Instagram">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
-        </a>
-        <!-- TODO: Replace with actual YouTube channel link -->
-        <a href="https://youtube.com/@aagamrealty" target="_blank" rel="noopener" aria-label="YouTube">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9.5v5l4.5-2.5Z"/></svg>
-        </a>
-        <!-- TODO: Replace with actual LinkedIn company page link -->
-        <a href="https://linkedin.com/company/aagamrealty" target="_blank" rel="noopener" aria-label="LinkedIn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="7" y1="10" x2="7" y2="17"/><line x1="7" y1="7" x2="7" y2="7.01"/><line x1="12" y1="13" x2="12" y2="17"/><path d="M12 13c0-2 3-2 3 0v4"/></svg>
-        </a>
-        <!-- TODO: Replace 919999999999 with actual WhatsApp number -->
-        <a href="https://wa.me/919999999999" target="_blank" rel="noopener" aria-label="WhatsApp">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21l1.65-4.95A9 9 0 1 1 8.5 19.5Z"/><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0Zm5 4a5 5 0 0 1-4-2"/></svg>
-        </a>
+        <div>
+          <h4>Connect With Us</h4>
+          <div class="social-icons">
+            <a href="https://www.instagram.com/aagam.realty/?__pwa=1" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+            <a href="https://www.facebook.com/share/1GfvHx7MFz/?mibextid=wwXIfr" aria-label="Facebook" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+          </div>
+          <div class="footer-contact-item"><i class="fa-solid fa-phone" aria-hidden="true"></i> +91 92271 00299</div>
+          <div class="footer-contact-item"><i class="fa-solid fa-envelope" aria-hidden="true"></i> hello@aagamrealty.com</div>
+        </div>
       </div>
     </div>
-  </div>
-  <p class="footer-bottom">© 2025 Aagam Realty. All rights reserved.</p>
-</footer>
+    <div class="footer-bottom">
+      &copy; 2026 Aagam Realty. All rights reserved.
+    </div>
+  </footer>
 
-<!-- ===== WHATSAPP FLOAT BUTTON ===== -->
-<!-- TODO: Replace 919999999999 with actual WhatsApp business number -->
-<a class="whatsapp-float" id="waFloat" href="https://wa.me/919999999999?text=Hi%20Aagam%20Realty!%20I%20am%20looking%20for%20a%20property.%20Can%20you%20help%20me%3F" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
-  <span class="tooltip">Chat with us on WhatsApp</span>
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-    <path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.07-1.33A9.93 9.93 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.45-4.38-1.23l-.31-.19-2.97.78.79-2.9-.2-.3A8 8 0 1 1 20 12a8 8 0 0 1-8 8zm4.4-5.93c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.01-.37.11-.49.12-.12.27-.31.4-.46.13-.15.18-.26.27-.43.09-.17.05-.32-.02-.46-.07-.14-.62-1.49-.85-2.04-.22-.53-.45-.46-.62-.47-.16-.01-.35-.01-.54-.01-.19 0-.49.07-.74.32-.25.25-.97.95-.97 2.32 0 1.37 1 2.69 1.14 2.88.14.19 1.93 2.95 4.69 4.02 2.76 1.07 2.76.71 3.26.67.5-.04 1.43-.58 1.63-1.15.2-.57.2-1.05.14-1.15-.06-.1-.24-.16-.48-.28z"/>
-  </svg>
-</a>
+  <!-- ===================== FLOATING WHATSAPP BUTTON ===================== -->
+  <a href="https://wa.me/919227100299?text=Hi%20Aagam%20Realty%2C%20I'm%20interested%20in%20a%20property."
+     class="whatsapp-float"
+     target="_blank"
+     rel="noopener"
+     aria-label="Chat with us on WhatsApp">
+    <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+    <span class="whatsapp-float-tooltip">Chat with us</span>
+  </a>
 
-<!-- ===== TOAST ===== -->
-<div class="toast" id="toast"></div>
-
-<script src="js/script.js"></script>
-
+  <!-- Site scripts -->
+  <script src="script.js"></script>
 </body>
 </html>
