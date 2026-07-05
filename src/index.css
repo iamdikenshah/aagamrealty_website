@@ -277,7 +277,7 @@ section { padding: 72px 0; }
     radial-gradient(circle at 15% 25%, rgba(27, 42, 74, 0.5) 0%, transparent 45%),
     radial-gradient(circle at 80% 80%, rgba(19, 31, 56, 0.5) 0%, transparent 45%),
     linear-gradient(135deg, rgba(27, 42, 74, 0.85) 0%, rgba(40, 60, 100, 0.78) 55%, rgba(17, 27, 50, 0.88) 100%),
-    url("images/hero-bg.jpg");
+    url("/images/hero-bg.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -625,7 +625,21 @@ section { padding: 72px 0; }
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
 }
-.form-group select { cursor: pointer; }
+.form-group select {
+  cursor: pointer;
+  /* Hide the native arrow and draw our own chevron so it matches the
+     Preferred Location dropdown (same purple fa-chevron-down, same 14px inset). */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%231B2A4A' d='M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 13px;
+}
+/* Hide the default arrow in IE/Edge legacy */
+.form-group select::-ms-expand { display: none; }
 .form-group textarea { resize: vertical; line-height: 1.5; }
 .form-group input::placeholder,
 .form-group textarea::placeholder { color: #9a97a8; }
@@ -731,6 +745,16 @@ section { padding: 72px 0; }
   box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.12);
 }
 .field-hint { display: block; margin-top: 8px; font-size: 12px; color: #9a97a8; }
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #e11d48;
+}
+.field-error i { font-size: 12px; }
 .enquiry-form .btn { width: 100%; margin-top: 4px; }
 .form-status {
   margin-top: 16px;
