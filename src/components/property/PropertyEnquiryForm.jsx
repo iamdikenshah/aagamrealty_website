@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GOOGLE_FORM, whatsappLink } from "../../data/content";
 import { CATEGORY_LABELS, TRANSACTION_LABELS } from "../../data/properties";
 
@@ -11,16 +11,29 @@ const EMPTY = { name: "", phone: "", email: "", message: "" };
  * "chat on WhatsApp" button carries whatever is currently in the Message box.
  */
 export default function PropertyEnquiryForm({ property, prefillConfig }) {
-  const [values, setValues] = useState(() => ({
-    ...EMPTY,
-    message: prefillConfig
-      ? `I'm interested in the ${prefillConfig} at ${property.title}. Please share more details.`
-      : `I'm interested in ${property.title} (${property.locality}). Please share more details.`,
-  }));
+  // Default message — config-specific when a configuration's "Enquire Now" was
+  // clicked, otherwise a generic one for the whole listing.
+  const defaultMessage = (config) =>
+    config
+      ? `I'm interested in the ${config} at ${property.title}. Please share more details.`
+      : `I'm interested in ${property.title} (${property.locality}). Please share more details.`;
+
+  const [values, setValues] = useState(() => ({ ...EMPTY, message: defaultMessage(prefillConfig) }));
+  // Once the visitor edits the Message box we stop auto-syncing it, so their
+  // wording is never clobbered when they tap another config's "Enquire Now".
+  const [messageEdited, setMessageEdited] = useState(false);
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [failed, setFailed] = useState(false);
+
+  // When a config is picked (prefillConfig changes) refresh the prefilled
+  // message — unless the visitor has already customised it.
+  useEffect(() => {
+    if (messageEdited) return;
+    setValues((v) => ({ ...v, message: defaultMessage(prefillConfig) }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefillConfig]);
 
   // Live WhatsApp link — always reflects the current Message box text.
   const waHref = whatsappLink(
@@ -29,6 +42,7 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
 
   const update = (e) => {
     const { name, value } = e.target;
+    if (name === "message") setMessageEdited(true);
     setValues((v) => ({ ...v, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
