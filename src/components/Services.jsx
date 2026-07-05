@@ -15,11 +15,16 @@ export default function Services() {
         <div className="deal-grid">
           {dealCategories.map((cat) => (
             <Reveal as="article" className="deal-card" key={cat.key}>
+              <i className={`fa-solid ${cat.icon} deal-card__watermark`} aria-hidden="true" />
+
               <div className="deal-card__head">
                 <div className="deal-card__icon">
                   <i className={`fa-solid ${cat.icon}`} aria-hidden="true" />
                 </div>
                 <div>
+                  <span className="deal-card__eyebrow">
+                    {cat.key === "commercial" ? "For business & returns" : "For living & investing"}
+                  </span>
                   <h3 className="deal-card__title">{cat.label}</h3>
                   <p className="deal-card__blurb">{cat.blurb}</p>
                 </div>
