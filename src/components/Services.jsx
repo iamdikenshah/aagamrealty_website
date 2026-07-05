@@ -1,5 +1,6 @@
 import Reveal from "./Reveal";
-import { services } from "../data/content";
+import { Link } from "../router.jsx";
+import { dealCategories } from "../data/content";
 
 export default function Services() {
   return (
@@ -7,18 +8,39 @@ export default function Services() {
       <div className="container">
         <Reveal as="h2" className="section-heading">What We Deal In</Reveal>
         <Reveal as="p" className="section-subheading">
-          From cozy rentals to prime plots, we cover every corner of the property market with expert
-          guidance at every step.
+          Residential or commercial — rent, buy, pre-lease or a plot. Pick a path and jump
+          straight to matching listings.
         </Reveal>
 
-        <div className="services-grid">
-          {services.map((service) => (
-            <Reveal as="article" className="service-card" key={service.title}>
-              <div className="service-icon">
-                <i className={`fa-solid ${service.icon}`} aria-hidden="true" />
+        <div className="deal-grid">
+          {dealCategories.map((cat) => (
+            <Reveal as="article" className="deal-card" key={cat.key}>
+              <i className={`fa-solid ${cat.icon} deal-card__watermark`} aria-hidden="true" />
+
+              <div className="deal-card__head">
+                <div className="deal-card__icon">
+                  <i className={`fa-solid ${cat.icon}`} aria-hidden="true" />
+                </div>
+                <div>
+                  <span className="deal-card__eyebrow">
+                    {cat.key === "commercial" ? "For business & returns" : "For living & investing"}
+                  </span>
+                  <h3 className="deal-card__title">{cat.label}</h3>
+                  <p className="deal-card__blurb">{cat.blurb}</p>
+                </div>
               </div>
-              <h3>{service.title}</h3>
-              <p>{service.text}</p>
+
+              <div className="deal-card__offerings">
+                {cat.offerings.map((o) => (
+                  <Link key={o.label} to={o.to} className="deal-offering">
+                    <span className="deal-offering__icon">
+                      <i className={`fa-solid ${o.icon}`} aria-hidden="true" />
+                    </span>
+                    <span className="deal-offering__label">{o.label}</span>
+                    <i className="fa-solid fa-arrow-right deal-offering__arrow" aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
             </Reveal>
           ))}
         </div>

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import Reveal from "./Reveal";
 import LocationMultiSelect from "./LocationMultiSelect";
 import {
   GOOGLE_FORM,
+  segmentOptions,
   requirementOptions,
   propertyCategoryOptions,
+  propertyCategoriesBySegment,
   bhkCategories,
   configurationOptions,
   buyBudgetOptions,
@@ -16,6 +17,7 @@ import {
 } from "../data/content";
 
 const EMPTY_FORM = {
+  segment: "",
   fullName: "",
   whatsapp: "",
   email: "",
@@ -30,6 +32,10 @@ const EMPTY_FORM = {
   details: "",
   consent: false,
 };
+
+// Property categories shown depend on the chosen segment (all until one is set).
+const categoryOptionsFor = (values) =>
+  values.segment ? propertyCategoriesBySegment[values.segment] : propertyCategoryOptions;
 
 // --- Conditional-logic helpers ------------------------------------------------
 // Configuration (BHK) only applies to residential-unit categories.
@@ -46,6 +52,9 @@ const budgetOptionsFor = (values) =>
 // Returns a specific error message for a single field, or "" when it's valid.
 function getFieldError(name, values, locations) {
   switch (name) {
+    case "segment":
+      return values.segment ? "" : "Please choose Residential or Commercial.";
+
     case "fullName":
       if (!values.fullName.trim()) return "Please enter your full name.";
       if (values.fullName.trim().length < 2)
@@ -114,6 +123,7 @@ function getFieldError(name, values, locations) {
 }
 
 const VALIDATED_FIELDS = [
+  "segment",
   "fullName",
   "whatsapp",
   "email",
@@ -128,7 +138,7 @@ const VALIDATED_FIELDS = [
   "consent",
 ];
 
-export default function Enquiry() {
+export default function EnquiryForm() {
   const [values, setValues] = useState(EMPTY_FORM);
   const [locations, setLocations] = useState([]);
   const [errors, setErrors] = useState({});
@@ -187,6 +197,18 @@ export default function Enquiry() {
     applyChanges(patch, ["requirement", "budget"]);
   };
 
+  // Segment (Residential/Commercial) narrows the property-category options —
+  // drop a now-invalid category (and its BHK) so a stale value can't be sent.
+  const setSegment = (value) => {
+    const patch = { segment: value };
+    const allowed = propertyCategoriesBySegment[value] || [];
+    if (values.propertyCategory && !allowed.includes(values.propertyCategory)) {
+      patch.propertyCategory = "";
+      patch.configuration = "";
+    }
+    applyChanges(patch, ["segment", "propertyCategory"]);
+  };
+
   // Category drives whether Configuration (BHK) applies.
   const setPropertyCategory = (value) => {
     const patch = { propertyCategory: value };
@@ -229,7 +251,8 @@ export default function Enquiry() {
     const data = new FormData();
     data.append(f.fullName, values.fullName);
     data.append(f.whatsapp, values.whatsapp);
-    data.append(f.requirement, values.requirement);
+    // Combine segment + requirement into one value, e.g. "Commercial Buy".
+    data.append(f.requirement, [values.segment, values.requirement].filter(Boolean).join(" "));
     if (values.email.trim()) data.append(f.email, values.email.trim());
     data.append(f.propertyCategory, values.propertyCategory);
     if (showConfiguration(values)) data.append(f.configuration, values.configuration);
@@ -274,16 +297,48 @@ export default function Enquiry() {
     ) : null;
 
   const budgetOptions = budgetOptionsFor(values);
+  const categoryOptions = categoryOptionsFor(values);
 
   return (
-    <section className="enquiry" id="contact">
-      <div className="container">
-        <Reveal as="h2" className="section-heading">Send Us an Enquiry</Reveal>
-        <Reveal as="p" className="section-subheading">
+    <>
+      <div className="enquiry-modal__head">
+        <h2 className="enquiry-modal__title">Send Us an Enquiry</h2>
+        <p className="enquiry-modal__sub">
           Tell us what you're looking for and we'll get back to you on WhatsApp.
-        </Reveal>
+        </p>
+      </div>
 
-        <Reveal as="form" className="enquiry-form" id="enquiryForm" noValidate onSubmit={handleSubmit}>
+      <form className="enquiry-form" id="enquiryForm" noValidate onSubmit={handleSubmit}>
+        {/* Segment: Residential / Commercial */}
+          <div className="form-group">
+            <span className="group-label" id="segmentLabel">
+              I'm looking for <span aria-hidden="true">*</span>
+            </span>
+            <div
+              className={`segmented${errors.segment ? " invalid" : ""}`}
+              role="radiogroup"
+              aria-labelledby="segmentLabel"
+            >
+              {segmentOptions.map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  role="radio"
+                  aria-checked={values.segment === opt}
+                  className={`segmented__option${values.segment === opt ? " active" : ""}`}
+                  onClick={() => setSegment(opt)}
+                >
+                  <i
+                    className={`fa-solid ${opt === "Commercial" ? "fa-building" : "fa-house-chimney"}`}
+                    aria-hidden="true"
+                  />
+                  {opt}
+                </button>
+              ))}
+            </div>
+            <FieldError name="segment" />
+          </div>
+
           {/* Full Name + WhatsApp Number */}
           <div className="form-row">
             <div className="form-group">
@@ -380,7 +435,7 @@ export default function Enquiry() {
                 onChange={(e) => setPropertyCategory(e.target.value)}
               >
                 <option value="" disabled>Select category</option>
-                {propertyCategoryOptions.map((opt) => (
+                {categoryOptions.map((opt) => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
@@ -573,8 +628,7 @@ export default function Enquiry() {
           <p className={`form-status${status.type ? ` ${status.type}` : ""}`} role="status" aria-live="polite">
             {status.message}
           </p>
-        </Reveal>
-      </div>
-    </section>
+      </form>
+    </>
   );
 }
