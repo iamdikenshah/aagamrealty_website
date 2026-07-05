@@ -14,7 +14,7 @@ export default function About() {
               relationships, not just transactions.
             </p>
             <p>
-              With <strong>4+ years of hands-on experience</strong> in the field, we specialize in{" "}
+              With <strong>9+ years of hands-on experience</strong> in the field, we specialize in{" "}
               <strong>rentals, owned properties, pre-lease investments, and land &amp; plots</strong>.
               Whether you're a first-time renter, a growing family, or a seasoned investor, we bring
               the same dedication to every deal.

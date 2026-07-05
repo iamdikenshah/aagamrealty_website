@@ -25,7 +25,7 @@ export const services = [
 
 export const stats = [
   { target: 150, suffix: "+", label: "Properties Sold & Rented" },
-  { target: 4, suffix: "+", label: "Years of Experience" },
+  { target: 9, suffix: "+", label: "Years of Experience" },
   { target: 200, suffix: "+", label: "Happy Clients" },
   { target: 50, suffix: "+", label: "Ongoing Listings" },
 ];

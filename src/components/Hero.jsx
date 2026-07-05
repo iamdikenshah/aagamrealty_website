@@ -3,12 +3,12 @@ export default function Hero() {
     <section className="hero" id="home">
       <div className="hero-content">
         <span className="hero-badge">
-          <i className="fa-solid fa-star" aria-hidden="true" /> 4+ Years of Trusted Expertise
+          <i className="fa-solid fa-star" aria-hidden="true" /> 9+ Years of Trusted Expertise
         </span>
         <h1>Your Trusted Partner in Real Estate</h1>
         <p className="sub">
           Helping you find the perfect property — whether it's for rent, purchase, pre-lease, or a
-          plot of land. 4+ years of trusted expertise in the real estate market.
+          plot of land. 9+ years of trusted expertise in the real estate market.
         </p>
         <div className="hero-cta">
           <a href="#services" className="btn btn-primary">Explore Properties</a>
