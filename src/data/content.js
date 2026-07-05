@@ -204,5 +204,10 @@ export const GOOGLE_FORM = {
   locationEntry: "entry.924428044",
 };
 
-export const WHATSAPP_LINK =
-  "https://wa.me/919227100299?text=Hi%20Aagam%20Realty%2C%20I'm%20interested%20in%20a%20property.";
+export const WHATSAPP_NUMBER = "919227100299";
+
+/** Build a wa.me deep-link that pre-fills the chat with `text`. */
+export const whatsappLink = (text) =>
+  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+
+export const WHATSAPP_LINK = whatsappLink("Hi Aagam Realty, I'm interested in a property.");

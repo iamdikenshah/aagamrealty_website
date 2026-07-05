@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { WHATSAPP_LINK } from "../../data/content";
+import { GOOGLE_FORM, whatsappLink } from "../../data/content";
+import { CATEGORY_LABELS, TRANSACTION_LABELS } from "../../data/properties";
 
 const EMPTY = { name: "", phone: "", email: "", message: "" };
 
 /**
  * Lead form shown on the detail page (sticky sidebar on desktop, inline on
- * mobile). No backend yet — on submit we validate, log the payload and show a
- * success state. When the CMS/CRM is wired, replace handleSubmit's body.
+ * mobile). Submits to the same Google Form endpoint as the main site enquiry
+ * (see data/content GOOGLE_FORM), mapping the fields onto its entry IDs. The
+ * "chat on WhatsApp" button carries whatever is currently in the Message box.
  */
 export default function PropertyEnquiryForm({ property, prefillConfig }) {
   const [values, setValues] = useState(() => ({
@@ -17,6 +19,13 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
   }));
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  // Live WhatsApp link — always reflects the current Message box text.
+  const waHref = whatsappLink(
+    values.message.trim() || `I'm interested in ${property.title} (${property.locality}).`
+  );
 
   const update = (e) => {
     const { name, value } = e.target;
@@ -35,16 +44,38 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
     return next;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const next = validate();
     setErrors(next);
     if (Object.keys(next).length) return;
 
-    // --- Lead submission seam: swap for a real CRM/API call later. ---
-    // eslint-disable-next-line no-console
-    console.log("[Property enquiry]", { propertyId: property.id, ...values });
-    setSent(true);
+    // Map onto the shared Google Form entry IDs — same sheet as the main enquiry.
+    const f = GOOGLE_FORM.fields;
+    const data = new FormData();
+    data.append(f.fullName, values.name.trim());
+    data.append(f.whatsapp, values.phone.trim());
+    if (values.email.trim()) data.append(f.email, values.email.trim());
+    const category = CATEGORY_LABELS[property.category] || "";
+    const transaction = TRANSACTION_LABELS[property.transaction] || "";
+    data.append(f.requirement, `${category} ${transaction}`.trim());
+    if (property.propertyType) data.append(f.propertyCategory, property.propertyType);
+    if (prefillConfig) data.append(f.configuration, prefillConfig);
+    data.append(GOOGLE_FORM.locationEntry, property.locality);
+    // Carry the full message (incl. the property reference) into the details cell.
+    data.append(GOOGLE_FORM.detailsEntry, values.message.trim());
+    data.append(f.consent, "Yes");
+
+    setSubmitting(true);
+    setFailed(false);
+    try {
+      await fetch(GOOGLE_FORM.action, { method: "POST", mode: "no-cors", body: data });
+      setSent(true);
+    } catch {
+      setFailed(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (sent) {
@@ -53,7 +84,7 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
         <div className="prop-enquiry__tick"><i className="fa-solid fa-circle-check" aria-hidden="true" /></div>
         <h3>Thank you!</h3>
         <p>We've received your enquiry for <strong>{property.title}</strong> and will get back to you shortly.</p>
-        <a className="btn btn-outline prop-enquiry__wa" href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer">
+        <a className="btn prop-enquiry__wa" href={waHref} target="_blank" rel="noopener noreferrer">
           <i className="fa-brands fa-whatsapp" aria-hidden="true" /> Chat on WhatsApp
         </a>
       </div>
@@ -91,10 +122,17 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
         <textarea name="message" rows="3" value={values.message} onChange={update} />
       </label>
 
-      <button type="submit" className="btn btn-primary prop-enquiry__submit">Enquire Now</button>
-      <a className="btn btn-outline prop-enquiry__wa" href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer">
-        <i className="fa-brands fa-whatsapp" aria-hidden="true" /> Or chat on WhatsApp
+      <button type="submit" className="btn btn-primary prop-enquiry__submit" disabled={submitting}>
+        {submitting ? "Sending…" : "Enquire Now"}
+      </button>
+      <a className="btn prop-enquiry__wa" href={waHref} target="_blank" rel="noopener noreferrer">
+        <i className="fa-brands fa-whatsapp" aria-hidden="true" /> Chat on WhatsApp
       </a>
+      {failed && (
+        <p className="prop-field__err" role="alert" style={{ marginTop: 10 }}>
+          Something went wrong. Please try again or chat with us on WhatsApp.
+        </p>
+      )}
     </form>
   );
 }

@@ -8,7 +8,7 @@ export default function Hero() {
         <span className="hero-badge">
           <i className="fa-solid fa-star" aria-hidden="true" /> 9+ Years of Trusted Expertise
         </span>
-        <h1>Your Trusted Partner in Real Estate</h1>
+        <h1>Your Trusted Partner in <span className="hero-highlight">Real Estate</span></h1>
         <p className="sub">
           Helping you find the perfect property — whether it's for rent, purchase, pre-lease, or a
           plot of land. 9+ years of trusted expertise in the real estate market.

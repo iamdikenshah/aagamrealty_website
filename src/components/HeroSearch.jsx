@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { navigate } from "../router.jsx";
+import HeroSelect from "./HeroSelect";
 import {
   getFilterFacets,
   budgetBandsFor,
@@ -37,6 +38,21 @@ export default function HeroSearch() {
     setTransaction(t);
     setBudget("");
   };
+
+  const localityOptions = useMemo(
+    () => [
+      { value: "", label: "All localities in Ahmedabad" },
+      ...localities.map((l) => ({ value: l, label: l })),
+    ],
+    [localities]
+  );
+  const budgetOptions = useMemo(
+    () => [
+      { value: "", label: "Any budget" },
+      ...bands.map((b, i) => ({ value: String(i), label: b.label })),
+    ],
+    [bands]
+  );
 
   const search = (e) => {
     e.preventDefault();
@@ -90,32 +106,20 @@ export default function HeroSearch() {
 
         {/* Location + budget + submit */}
         <div className="hero-search__row">
-          <div className="hero-search__field">
-            <i className="fa-solid fa-location-dot" aria-hidden="true" />
-            <select
-              aria-label="Locality"
-              value={locality}
-              onChange={(e) => setLocality(e.target.value)}
-            >
-              <option value="">All localities in Ahmedabad</option>
-              {localities.map((l) => (
-                <option key={l} value={l}>{l}</option>
-              ))}
-            </select>
-          </div>
-          <div className="hero-search__field">
-            <i className="fa-solid fa-indian-rupee-sign" aria-hidden="true" />
-            <select
-              aria-label="Budget"
-              value={budget}
-              onChange={(e) => setBudget(e.target.value)}
-            >
-              <option value="">Any budget</option>
-              {bands.map((b, i) => (
-                <option key={b.label} value={i}>{b.label}</option>
-              ))}
-            </select>
-          </div>
+          <HeroSelect
+            icon="fa-location-dot"
+            ariaLabel="Locality"
+            value={locality}
+            options={localityOptions}
+            onChange={setLocality}
+          />
+          <HeroSelect
+            icon="fa-indian-rupee-sign"
+            ariaLabel="Budget"
+            value={budget}
+            options={budgetOptions}
+            onChange={setBudget}
+          />
           <button type="submit" className="btn btn-primary hero-search__submit">
             <i className="fa-solid fa-magnifying-glass" aria-hidden="true" /> Search
           </button>
