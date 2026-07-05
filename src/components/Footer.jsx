@@ -1,4 +1,6 @@
-import { navLinks } from "../data/content";
+import { navLinks, footerLocalities } from "../data/content";
+import { Link, navigate } from "../router.jsx";
+import { openEnquiry } from "../enquiryStore";
 
 export default function Footer() {
   return (
@@ -19,7 +21,50 @@ export default function Footer() {
             <ul className="footer-links">
               {navLinks.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href}>{link.label}</a>
+                  <a
+                    href={link.href}
+                    onClick={(e) => {
+                      // "Contact" opens the enquiry popup.
+                      if (link.href === "#contact") {
+                        e.preventDefault();
+                        openEnquiry();
+                        return;
+                      }
+                      // Path links (e.g. /properties) do SPA navigation.
+                      if (link.href.startsWith("/")) {
+                        e.preventDefault();
+                        navigate(link.href);
+                        return;
+                      }
+                      // Hash link from a sub-page: route home, then scroll.
+                      // On home it falls through to the global scroll handler.
+                      if (window.location.pathname !== "/") {
+                        e.preventDefault();
+                        const id = link.href.slice(1);
+                        navigate("/", { scrollToTop: false });
+                        setTimeout(() => {
+                          const el = document.getElementById(id);
+                          if (id === "home" || !el) window.scrollTo({ top: 0, behavior: "smooth" });
+                          else el.scrollIntoView({ behavior: "smooth" });
+                        }, 60);
+                      }
+                    }}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4>Popular Localities</h4>
+            <ul className="footer-links">
+              {footerLocalities.map((locality) => (
+                <li key={locality}>
+                  <Link to={`/properties?locality=${encodeURIComponent(locality)}`}>
+                    Property in {locality}
+                  </Link>
                 </li>
               ))}
             </ul>

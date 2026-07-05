@@ -1,25 +1,32 @@
 // Central content for the site — edit copy here without touching component code.
 
-export const services = [
+// "What We Deal In" — two top-level categories (Residential / Commercial), each
+// with the four ways we can help (Rent, Buy, Pre-Lease, Land/Plot). Every
+// offering deep-links straight into the matching listing view.
+export const dealCategories = [
   {
-    icon: "fa-key",
-    title: "Rent",
-    text: "Find your ideal rental property. Residential and commercial spaces tailored to your needs and budget.",
+    key: "residential",
+    label: "Residential",
+    icon: "fa-house-chimney",
+    blurb: "Homes to live in or invest in — flats, villas, bungalows and plots.",
+    offerings: [
+      { label: "Rent", icon: "fa-key", to: "/properties?category=residential&transaction=rent" },
+      { label: "Buy", icon: "fa-house", to: "/properties?category=residential&transaction=buy" },
+      { label: "Pre-Lease", icon: "fa-file-signature", to: "/properties?category=residential&transaction=pre-lease" },
+      { label: "Land / Plot", icon: "fa-map-location-dot", to: "/properties?category=residential&listingType=land" },
+    ],
   },
   {
-    icon: "fa-house",
-    title: "Owned Properties",
-    text: "Buy your dream property with confidence. End-to-end assistance from search to registration.",
-  },
-  {
+    key: "commercial",
+    label: "Commercial",
     icon: "fa-building",
-    title: "Pre-Lease",
-    text: "Invest in pre-leased commercial properties with assured rental income and long-term value.",
-  },
-  {
-    icon: "fa-map-location-dot",
-    title: "Land / Plots",
-    text: "Explore residential and commercial plots in prime locations. Verified titles, clear documentation.",
+    blurb: "Offices, shops, showrooms & pre-leased assets for business and returns.",
+    offerings: [
+      { label: "Rent", icon: "fa-key", to: "/properties?category=commercial&transaction=rent" },
+      { label: "Buy", icon: "fa-store", to: "/properties?category=commercial&transaction=buy" },
+      { label: "Pre-Lease", icon: "fa-file-signature", to: "/properties?category=commercial&transaction=pre-lease" },
+      { label: "Land / Plot", icon: "fa-map-location-dot", to: "/properties?category=commercial&listingType=land" },
+    ],
   },
 ];
 
@@ -65,13 +72,31 @@ export const testimonials = [
 
 export const navLinks = [
   { href: "#home", label: "Home" },
+  { href: "#featured", label: "Properties" },
   { href: "#services", label: "Services" },
   { href: "#about", label: "About" },
   { href: "#testimonials", label: "Testimonials" },
   { href: "#contact", label: "Contact" },
 ];
 
+// Locality quick-links for the footer (SEO). Each deep-links into the listing
+// page pre-filtered to that locality. Kept to localities we actually list.
+export const footerLocalities = [
+  "Adani Shantigram",
+  "Bopal",
+  "South Bopal",
+  "Satellite",
+  "SG Highway",
+  "Prahlad Nagar",
+  "CG Road",
+  "Shela",
+];
+
 export const requirementOptions = ["Buy", "Rent", "Pre-Lease"];
+
+// Top-level segment for the enquiry form. Combined with the requirement on
+// submit (e.g. "Commercial Buy") so a single value captures both.
+export const segmentOptions = ["Residential", "Commercial"];
 
 export const propertyCategoryOptions = [
   "Flat/Apartment",
@@ -81,6 +106,13 @@ export const propertyCategoryOptions = [
   "Plot/Land",
   "Commercial/Office",
 ];
+
+// Which property categories are offered under each segment, so the category
+// dropdown only shows what's relevant once a segment is picked.
+export const propertyCategoriesBySegment = {
+  Residential: ["Flat/Apartment", "Villa", "Bungalow", "Row House", "Plot/Land"],
+  Commercial: ["Commercial/Office", "Plot/Land"],
+};
 
 // Categories for which a BHK configuration is relevant. Plot/Land and
 // Commercial/Office are intentionally excluded — the Configuration field is

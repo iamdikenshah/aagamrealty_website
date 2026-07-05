@@ -1,0 +1,400 @@
+[
+  {
+    "id": "shantigram-skyline",
+    "category": "residential",
+    "transaction": "buy",
+    "listingType": "owned",
+    "title": "Shantigram Skyline Residences",
+    "developer": "Aagam-affiliated Developer",
+    "locality": "Adani Shantigram",
+    "city": "Ahmedabad",
+    "priceMin": 3.15,
+    "priceMax": 4.85,
+    "priceUnit": "Cr",
+    "propertyType": "Flat",
+    "purchaseType": "New Booking",
+    "totalArea": "18 acres",
+    "possessionDate": "December 2027",
+    "projectStage": "Under Construction",
+    "totalUnits": 420,
+    "launchDate": "March 2025",
+    "featured": true,
+    "configurations": [
+      { "config": "3 BHK", "superBuiltupArea": 2450, "areaUnit": "sqft", "carpetArea": 1720, "otherArea": 210, "usableArea": 1930, "price": 3.15 },
+      { "config": "4 BHK", "superBuiltupArea": 3180, "areaUnit": "sqft", "carpetArea": 2260, "otherArea": 260, "usableArea": 2520, "price": 4.1 },
+      { "config": "4.5 BHK", "superBuiltupArea": 3620, "areaUnit": "sqft", "carpetArea": 2580, "otherArea": 300, "usableArea": 2880, "price": 4.85 }
+    ],
+    "towers": [
+      { "name": "Tower A", "bedroomType": "3 & 4 BHK", "unitsOnFloor": 4, "lifts": 3, "storeys": 28 },
+      { "name": "Tower B", "bedroomType": "4 & 4.5 BHK", "unitsOnFloor": 3, "lifts": 3, "storeys": 30 }
+    ],
+    "description": "Set within the green, master-planned township of Adani Shantigram, Skyline Residences pairs low-density living with skyline views over the Sabarmati riverfront. Homes are designed for cross-ventilation and natural light, with deep sit-out decks and premium fittings throughout. A clubhouse, landscaped podium and dedicated kids' zones make it built for families who want space without leaving the city behind.",
+    "keyFeatures": [
+      "3-side open apartments with wide decks",
+      "Double-height grand entrance lobby",
+      "80% open landscaped area",
+      "Vastu-compliant layouts",
+      "5-tier security with video door phones",
+      "EV charging points on every parking level"
+    ],
+    "amenities": [
+      "Swimming Pool", "Clubhouse", "Gymnasium", "Landscaped Garden", "Kids Play Area",
+      "Indoor Games", "Jogging Track", "Yoga Deck", "Amphitheatre", "Power Backup",
+      "24x7 Security", "Covered Parking"
+    ],
+    "gallery": [
+      { "url": "https://picsum.photos/seed/skyline-elev-1/1200/800", "category": "Elevation" },
+      { "url": "https://picsum.photos/seed/skyline-elev-2/1200/800", "category": "Elevation" },
+      { "url": "https://picsum.photos/seed/skyline-amen-1/1200/800", "category": "Amenities" },
+      { "url": "https://picsum.photos/seed/skyline-amen-2/1200/800", "category": "Amenities" },
+      { "url": "https://picsum.photos/seed/skyline-const-1/1200/800", "category": "Construction" },
+      { "url": "https://picsum.photos/seed/skyline-nbr-1/1200/800", "category": "Neighbourhood" }
+    ],
+    "videoUrl": "https://www.youtube.com/embed/aqz-KE-bpKQ",
+    "location": { "lat": 23.1225, "lng": 72.5714, "address": "Adani Shantigram, S.G. Highway, Ahmedabad 382421" },
+    "nearby": [
+      { "label": "Shantigram Township Gate", "distanceKm": 0.4, "category": "Landmark" },
+      { "label": "Adani Vidya Mandir", "distanceKm": 1.2, "category": "School" },
+      { "label": "Vaishnodevi Circle", "distanceKm": 3.5, "category": "Connectivity" },
+      { "label": "Shalby Hospital, SG Highway", "distanceKm": 6.0, "category": "Hospital" }
+    ],
+    "rera": { "id": "PR/GJ/AHMEDABAD/AHMEDABAD CITY/AUDA/RAA12345/2025", "authority": "GujRERA", "qrUrl": "" },
+    "images": [
+      "https://picsum.photos/seed/skyline-hero-1/1200/800",
+      "https://picsum.photos/seed/skyline-hero-2/1200/800",
+      "https://picsum.photos/seed/skyline-hero-3/1200/800"
+    ]
+  },
+  {
+    "id": "bopal-greens-3bhk",
+    "category": "residential",
+    "transaction": "rent",
+    "listingType": "rental",
+    "title": "Bopal Greens — Furnished 3 BHK",
+    "locality": "Bopal",
+    "city": "Ahmedabad",
+    "priceMin": 42000,
+    "priceMax": 42000,
+    "priceUnit": "per month",
+    "propertyType": "Flat",
+    "purchaseType": "Rental",
+    "totalArea": "1,980 sqft",
+    "projectStage": "Ready to Move",
+    "featured": true,
+    "configurations": [
+      { "config": "3 BHK", "superBuiltupArea": 1980, "areaUnit": "sqft", "carpetArea": 1440, "otherArea": 120, "usableArea": 1560, "price": 42000 }
+    ],
+    "description": "A bright, fully furnished 3 BHK in a well-managed Bopal society, ideal for families relocating to west Ahmedabad. Move-in ready with modular kitchen, wardrobes, ACs and premium sofas. Two covered car parks, 24x7 security and a society clubhouse with pool. Walking distance to schools and daily-needs retail.",
+    "keyFeatures": [
+      "Fully furnished — ready to move",
+      "2 covered car parks",
+      "East-facing, ample natural light",
+      "Modular kitchen with chimney & hob",
+      "3 ACs + wardrobes in all bedrooms"
+    ],
+    "amenities": [
+      "Swimming Pool", "Clubhouse", "Gymnasium", "Kids Play Area", "Power Backup",
+      "24x7 Security", "Covered Parking", "Landscaped Garden"
+    ],
+    "gallery": [
+      { "url": "https://picsum.photos/seed/bopal-amen-1/1200/800", "category": "Amenities" },
+      { "url": "https://picsum.photos/seed/bopal-nbr-1/1200/800", "category": "Neighbourhood" },
+      { "url": "https://picsum.photos/seed/bopal-others-1/1200/800", "category": "Others" }
+    ],
+    "videoUrl": "",
+    "location": { "lat": 23.0333, "lng": 72.4646, "address": "Bopal, Ahmedabad 380058" },
+    "nearby": [
+      { "label": "Bopal Cross Roads", "distanceKm": 0.8, "category": "Connectivity" },
+      { "label": "Delhi Public School Bopal", "distanceKm": 1.5, "category": "School" },
+      { "label": "D-Mart Bopal", "distanceKm": 1.1, "category": "Shopping" }
+    ],
+    "rera": null,
+    "images": [
+      "https://picsum.photos/seed/bopal-hero-1/1200/800",
+      "https://picsum.photos/seed/bopal-hero-2/1200/800"
+    ]
+  },
+  {
+    "id": "prahladnagar-corporate-hub",
+    "category": "commercial",
+    "transaction": "pre-lease",
+    "listingType": "pre-lease",
+    "title": "Prahlad Nagar Corporate Hub — Pre-Leased Office",
+    "developer": "Grade-A Business Park",
+    "locality": "Prahlad Nagar",
+    "city": "Ahmedabad",
+    "priceMin": 2.75,
+    "priceMax": 2.75,
+    "priceUnit": "Cr",
+    "propertyType": "Commercial Office",
+    "purchaseType": "Pre-lease",
+    "totalArea": "2,100 sqft",
+    "projectStage": "Ready to Move",
+    "featured": true,
+    "configurations": [
+      { "config": "Office Unit", "superBuiltupArea": 2100, "areaUnit": "sqft", "carpetArea": 1480, "otherArea": 0, "usableArea": 1480, "price": 2.75 }
+    ],
+    "description": "A pre-leased Grade-A office unit on a prime Prahlad Nagar frontage, currently tenanted by an established IT services firm on a 9-year lock-in lease. A ready income-generating asset delivering roughly 7% annual yield with built-in escalation clauses — a clean, low-touch investment for buyers seeking assured returns without the wait of a new build.",
+    "keyFeatures": [
+      "Tenanted — ~7% assured annual yield",
+      "9-year registered lease with escalation",
+      "Grade-A building, prime road frontage",
+      "2 dedicated covered parks",
+      "100% power backup"
+    ],
+    "amenities": [
+      "Power Backup", "24x7 Security", "Covered Parking", "High-Speed Lifts",
+      "CCTV Surveillance", "Cafeteria"
+    ],
+    "gallery": [
+      { "url": "https://picsum.photos/seed/corp-elev-1/1200/800", "category": "Elevation" },
+      { "url": "https://picsum.photos/seed/corp-others-1/1200/800", "category": "Others" },
+      { "url": "https://picsum.photos/seed/corp-nbr-1/1200/800", "category": "Neighbourhood" }
+    ],
+    "videoUrl": "",
+    "location": { "lat": 23.0119, "lng": 72.5081, "address": "Prahlad Nagar, Ahmedabad 380015" },
+    "nearby": [
+      { "label": "Prahlad Nagar Garden", "distanceKm": 0.6, "category": "Landmark" },
+      { "label": "ISCON Cross Roads", "distanceKm": 2.3, "category": "Connectivity" },
+      { "label": "Iscon Mega Mall", "distanceKm": 2.0, "category": "Shopping" }
+    ],
+    "rera": { "id": "PR/GJ/AHMEDABAD/AHMEDABAD CITY/AUDA/CA98765/2022", "authority": "GujRERA", "qrUrl": "" },
+    "images": [
+      "https://picsum.photos/seed/corp-hero-1/1200/800",
+      "https://picsum.photos/seed/corp-hero-2/1200/800"
+    ]
+  },
+  {
+    "id": "shela-residential-plots",
+    "category": "residential",
+    "transaction": "buy",
+    "listingType": "land",
+    "title": "Shela Riverside Residential Plots",
+    "locality": "Shela",
+    "city": "Ahmedabad",
+    "priceMin": 85,
+    "priceMax": 160,
+    "priceUnit": "Lac",
+    "propertyType": "Land",
+    "purchaseType": "New Booking",
+    "totalArea": "9 acres",
+    "featured": false,
+    "configurations": [
+      { "config": "Plot — 250 sqyrd", "superBuiltupArea": 250, "areaUnit": "sqyrd", "carpetArea": 250, "otherArea": 0, "usableArea": 250, "price": 85 },
+      { "config": "Plot — 350 sqyrd", "superBuiltupArea": 350, "areaUnit": "sqyrd", "carpetArea": 350, "otherArea": 0, "usableArea": 350, "price": 120 },
+      { "config": "Plot — 450 sqyrd", "superBuiltupArea": 450, "areaUnit": "sqyrd", "carpetArea": 450, "otherArea": 0, "usableArea": 450, "price": 160 }
+    ],
+    "description": "Clear-title, AUDA-approved residential plots in fast-appreciating Shela, minutes from SP Ring Road and the new SG Highway growth corridor. Fully developed layout with tar roads, underground drainage, street lighting and a gated entrance — ready to register and build. A sound land-banking option with strong end-use demand.",
+    "keyFeatures": [
+      "AUDA-approved, clear & marketable title",
+      "Gated layout with tar roads & drainage",
+      "Street lighting and water connection ready",
+      "N.A. (non-agricultural) converted",
+      "Immediate registration & possession"
+    ],
+    "amenities": ["Gated Entrance", "Internal Roads", "Street Lighting", "Underground Drainage", "Landscaped Common Area"],
+    "gallery": [
+      { "url": "https://picsum.photos/seed/shela-elev-1/1200/800", "category": "Elevation" },
+      { "url": "https://picsum.photos/seed/shela-nbr-1/1200/800", "category": "Neighbourhood" },
+      { "url": "https://picsum.photos/seed/shela-others-1/1200/800", "category": "Others" }
+    ],
+    "videoUrl": "",
+    "location": { "lat": 23.0007, "lng": 72.4671, "address": "Shela, Ahmedabad 380058" },
+    "nearby": [
+      { "label": "SP Ring Road", "distanceKm": 1.8, "category": "Connectivity" },
+      { "label": "Shantipura Circle", "distanceKm": 2.5, "category": "Landmark" },
+      { "label": "Ahmedabad International School", "distanceKm": 3.2, "category": "School" }
+    ],
+    "rera": { "id": "PR/GJ/AHMEDABAD/AHMEDABAD CITY/AUDA/PL45678/2024", "authority": "GujRERA", "qrUrl": "" },
+    "images": [
+      "https://picsum.photos/seed/shela-hero-1/1200/800",
+      "https://picsum.photos/seed/shela-hero-2/1200/800"
+    ]
+  },
+  {
+    "id": "satellite-signature-villa",
+    "category": "residential",
+    "transaction": "buy",
+    "listingType": "owned",
+    "title": "Satellite Signature 4 BHK Villa",
+    "developer": "Independent Bungalow Scheme",
+    "locality": "Satellite",
+    "city": "Ahmedabad",
+    "priceMin": 5.9,
+    "priceMax": 5.9,
+    "priceUnit": "Cr",
+    "propertyType": "Villa",
+    "purchaseType": "Resale",
+    "totalArea": "410 sqyrd plot",
+    "possessionDate": "Immediate",
+    "projectStage": "Ready to Move",
+    "totalUnits": 1,
+    "featured": true,
+    "configurations": [
+      { "config": "4 BHK Villa", "superBuiltupArea": 3850, "areaUnit": "sqft", "carpetArea": 3100, "otherArea": 320, "usableArea": 3420, "price": 5.9 }
+    ],
+    "description": "A well-maintained, independent 4 BHK villa in the heart of Satellite on a 410 sq.yd plot. Three levels of generous living with a private garden, terrace and covered parking for three cars. Recently renovated interiors, a modern modular kitchen and a home-office room. Prime, central location with everything within a 2 km radius.",
+    "keyFeatures": [
+      "Independent villa on 410 sq.yd plot",
+      "Private garden + terrace",
+      "Covered parking for 3 cars",
+      "Recently renovated interiors",
+      "Dedicated home-office / study",
+      "Borewell + municipal water"
+    ],
+    "amenities": ["Private Garden", "Terrace Deck", "Covered Parking", "Power Backup", "24x7 Security", "Modular Kitchen"],
+    "gallery": [
+      { "url": "https://picsum.photos/seed/villa-elev-1/1200/800", "category": "Elevation" },
+      { "url": "https://picsum.photos/seed/villa-amen-1/1200/800", "category": "Amenities" },
+      { "url": "https://picsum.photos/seed/villa-nbr-1/1200/800", "category": "Neighbourhood" }
+    ],
+    "videoUrl": "",
+    "location": { "lat": 23.0301, "lng": 72.5261, "address": "Satellite, Ahmedabad 380015" },
+    "nearby": [
+      { "label": "Jodhpur Cross Roads", "distanceKm": 1.0, "category": "Connectivity" },
+      { "label": "Udgam School", "distanceKm": 1.4, "category": "School" },
+      { "label": "Rajpath Club", "distanceKm": 2.1, "category": "Landmark" }
+    ],
+    "rera": null,
+    "images": [
+      "https://picsum.photos/seed/villa-hero-1/1200/800",
+      "https://picsum.photos/seed/villa-hero-2/1200/800"
+    ]
+  },
+  {
+    "id": "sg-highway-showroom-rent",
+    "category": "commercial",
+    "transaction": "rent",
+    "listingType": "rental",
+    "title": "SG Highway Showroom Space",
+    "locality": "SG Highway",
+    "city": "Ahmedabad",
+    "priceMin": 185000,
+    "priceMax": 185000,
+    "priceUnit": "per month",
+    "propertyType": "Commercial Office",
+    "purchaseType": "Rental",
+    "totalArea": "3,400 sqft",
+    "projectStage": "Ready to Move",
+    "featured": true,
+    "configurations": [
+      { "config": "Showroom / Office", "superBuiltupArea": 3400, "areaUnit": "sqft", "carpetArea": 2600, "otherArea": 0, "usableArea": 2600, "price": 185000 }
+    ],
+    "description": "A high-visibility ground-floor showroom on the SG Highway main frontage — ideal for retail brands, banks or a flagship office. Double-height glass facade, large signage rights and ample front parking. Warm-shell condition with washrooms and dedicated power sanction in place.",
+    "keyFeatures": [
+      "Prime SG Highway main-road frontage",
+      "Double-height glass facade",
+      "Large signage / branding rights",
+      "Front + basement parking",
+      "3-phase power sanction"
+    ],
+    "amenities": ["Power Backup", "24x7 Security", "Covered Parking", "High-Speed Lifts", "CCTV Surveillance"],
+    "gallery": [
+      { "url": "https://picsum.photos/seed/sgshow-elev-1/1200/800", "category": "Elevation" },
+      { "url": "https://picsum.photos/seed/sgshow-others-1/1200/800", "category": "Others" }
+    ],
+    "videoUrl": "",
+    "location": { "lat": 23.0478, "lng": 72.5065, "address": "SG Highway, Ahmedabad 380054" },
+    "nearby": [
+      { "label": "Gurudwara Circle", "distanceKm": 0.9, "category": "Connectivity" },
+      { "label": "Ahmedabad One Mall", "distanceKm": 1.6, "category": "Shopping" },
+      { "label": "Thaltej Metro Station", "distanceKm": 2.4, "category": "Connectivity" }
+    ],
+    "rera": null,
+    "images": [
+      "https://picsum.photos/seed/sgshow-hero-1/1200/800",
+      "https://picsum.photos/seed/sgshow-hero-2/1200/800"
+    ]
+  },
+  {
+    "id": "cg-road-retail-buy",
+    "category": "commercial",
+    "transaction": "buy",
+    "listingType": "owned",
+    "title": "CG Road Retail Showroom — For Sale",
+    "developer": "Prime Commercial Complex",
+    "locality": "CG Road",
+    "city": "Ahmedabad",
+    "priceMin": 3.4,
+    "priceMax": 3.4,
+    "priceUnit": "Cr",
+    "propertyType": "Commercial Office",
+    "purchaseType": "Resale",
+    "totalArea": "1,650 sqft",
+    "projectStage": "Ready to Move",
+    "featured": true,
+    "configurations": [
+      { "config": "Retail Showroom", "superBuiltupArea": 1650, "areaUnit": "sqft", "carpetArea": 1180, "otherArea": 0, "usableArea": 1180, "price": 3.4 }
+    ],
+    "description": "A ground-floor retail showroom on Ahmedabad's flagship CG Road high-street, with unbeatable footfall and glass-frontage visibility. Ideal for brand outlets, banks or premium F&B. Freehold ownership, ready to fit-out, with mezzanine potential and dedicated customer parking in the complex.",
+    "keyFeatures": [
+      "Flagship CG Road high-street frontage",
+      "Ground floor with mezzanine potential",
+      "Freehold — clear title",
+      "High daily footfall location",
+      "Dedicated complex parking"
+    ],
+    "amenities": ["Power Backup", "24x7 Security", "Covered Parking", "High-Speed Lifts", "CCTV Surveillance", "Fire Safety"],
+    "gallery": [
+      { "url": "https://picsum.photos/seed/cgroad-elev-1/1200/800", "category": "Elevation" },
+      { "url": "https://picsum.photos/seed/cgroad-others-1/1200/800", "category": "Others" }
+    ],
+    "videoUrl": "",
+    "location": { "lat": 23.0281, "lng": 72.561, "address": "CG Road, Navrangpura, Ahmedabad 380009" },
+    "nearby": [
+      { "label": "Municipal Market", "distanceKm": 0.5, "category": "Landmark" },
+      { "label": "Law Garden", "distanceKm": 1.0, "category": "Landmark" },
+      { "label": "Gujarat College", "distanceKm": 1.3, "category": "Connectivity" }
+    ],
+    "rera": null,
+    "images": [
+      "https://picsum.photos/seed/cgroad-hero-1/1200/800",
+      "https://picsum.photos/seed/cgroad-hero-2/1200/800"
+    ]
+  },
+  {
+    "id": "south-bopal-2bhk-rent",
+    "category": "residential",
+    "transaction": "rent",
+    "listingType": "rental",
+    "title": "South Bopal Semi-Furnished 2 BHK",
+    "locality": "South Bopal",
+    "city": "Ahmedabad",
+    "priceMin": 24000,
+    "priceMax": 24000,
+    "priceUnit": "per month",
+    "propertyType": "Flat",
+    "purchaseType": "Rental",
+    "totalArea": "1,320 sqft",
+    "projectStage": "Ready to Move",
+    "featured": false,
+    "configurations": [
+      { "config": "2 BHK", "superBuiltupArea": 1320, "areaUnit": "sqft", "carpetArea": 980, "otherArea": 90, "usableArea": 1070, "price": 24000 }
+    ],
+    "description": "A comfortable, well-lit 2 BHK in a family-friendly South Bopal society — semi-furnished with wardrobes, modular kitchen and fans/lights in place. One covered parking, lift and 24x7 security. Close to schools, supermarkets and the SP Ring Road for an easy city commute.",
+    "keyFeatures": [
+      "Semi-furnished — wardrobes & kitchen",
+      "1 covered car park",
+      "Well-ventilated, corner unit",
+      "Society with lift & security",
+      "Near schools and daily-needs retail"
+    ],
+    "amenities": ["Power Backup", "24x7 Security", "Covered Parking", "Lift", "Kids Play Area", "Landscaped Garden"],
+    "gallery": [
+      { "url": "https://picsum.photos/seed/sbopal-amen-1/1200/800", "category": "Amenities" },
+      { "url": "https://picsum.photos/seed/sbopal-nbr-1/1200/800", "category": "Neighbourhood" }
+    ],
+    "videoUrl": "",
+    "location": { "lat": 23.0271, "lng": 72.4695, "address": "South Bopal, Ahmedabad 380058" },
+    "nearby": [
+      { "label": "South Bopal Cross Roads", "distanceKm": 0.7, "category": "Connectivity" },
+      { "label": "Zydus School for Excellence", "distanceKm": 1.4, "category": "School" },
+      { "label": "SP Ring Road", "distanceKm": 1.1, "category": "Connectivity" }
+    ],
+    "rera": null,
+    "images": [
+      "https://picsum.photos/seed/sbopal-hero-1/1200/800",
+      "https://picsum.photos/seed/sbopal-hero-2/1200/800"
+    ]
+  }
+]
