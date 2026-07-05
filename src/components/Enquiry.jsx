@@ -4,16 +4,44 @@ import LocationMultiSelect from "./LocationMultiSelect";
 import {
   GOOGLE_FORM,
   requirementOptions,
-  propertyTypeOptions,
+  propertyCategoryOptions,
+  bhkCategories,
+  configurationOptions,
+  buyBudgetOptions,
+  rentBudgetOptions,
+  purposeOptions,
+  timelineOptions,
+  furnishingOptions,
+  sourceOptions,
 } from "../data/content";
 
 const EMPTY_FORM = {
   fullName: "",
   whatsapp: "",
+  email: "",
   requirement: "",
-  propertyType: "",
+  propertyCategory: "",
+  configuration: "",
+  budget: "",
+  purpose: "",
+  timeline: "",
+  furnishing: "",
+  source: "",
   details: "",
+  consent: false,
 };
+
+// --- Conditional-logic helpers ------------------------------------------------
+// Configuration (BHK) only applies to residential-unit categories.
+const showConfiguration = (values) =>
+  bhkCategories.includes(values.propertyCategory);
+// Furnishing preference only applies to rentals.
+const showFurnishing = (values) => values.requirement === "Rent";
+// Purpose is hidden for Pre-Lease (assumed to always be investment/business).
+const showPurpose = (values) => values.requirement !== "Pre-Lease";
+// Rent uses monthly-rent budget bands; Buy/Pre-Lease use sale-price bands.
+const budgetOptionsFor = (values) =>
+  values.requirement === "Rent" ? rentBudgetOptions : buyBudgetOptions;
 
 // Returns a specific error message for a single field, or "" when it's valid.
 function getFieldError(name, values, locations) {
@@ -31,21 +59,54 @@ function getFieldError(name, values, locations) {
       if (!/^[0-9+\s-]+$/.test(raw))
         return "Please enter a valid mobile number (digits only).";
       const digits = raw.replace(/\D/g, "");
-      if (digits.length < 10)
-        return "Mobile number is too short. Please enter a valid mobile number.";
-      if (digits.length > 15)
-        return "Mobile number is too long. Please enter a valid mobile number.";
+      // Allow an optional 91 country code in front of a 10-digit number.
+      const national = digits.startsWith("91") && digits.length > 10
+        ? digits.slice(2)
+        : digits;
+      if (national.length !== 10)
+        return "Please enter a valid 10-digit mobile number.";
+      return "";
+    }
+
+    case "email": {
+      const raw = values.email.trim();
+      if (!raw) return ""; // optional
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw))
+        return "Please enter a valid email address.";
       return "";
     }
 
     case "requirement":
       return values.requirement ? "" : "Please select a requirement type.";
 
-    case "propertyType":
-      return values.propertyType ? "" : "Please select a property type.";
+    case "propertyCategory":
+      return values.propertyCategory ? "" : "Please select a property category.";
+
+    case "configuration":
+      if (!showConfiguration(values)) return "";
+      return values.configuration ? "" : "Please select a configuration.";
+
+    case "budget":
+      return values.budget ? "" : "Please select a budget range.";
+
+    case "purpose":
+      if (!showPurpose(values)) return "";
+      return values.purpose ? "" : "Please select a purpose.";
 
     case "locations":
       return locations.length > 0 ? "" : "Please select at least one location.";
+
+    case "timeline":
+      return values.timeline ? "" : "Please select a timeline.";
+
+    case "furnishing":
+      if (!showFurnishing(values)) return "";
+      return values.furnishing ? "" : "Please select a furnishing preference.";
+
+    case "consent":
+      return values.consent
+        ? ""
+        : "Please agree to be contacted to continue.";
 
     default:
       return "";
@@ -55,9 +116,16 @@ function getFieldError(name, values, locations) {
 const VALIDATED_FIELDS = [
   "fullName",
   "whatsapp",
+  "email",
   "requirement",
-  "propertyType",
+  "propertyCategory",
+  "configuration",
+  "budget",
+  "purpose",
   "locations",
+  "timeline",
+  "furnishing",
+  "consent",
 ];
 
 export default function Enquiry() {
@@ -80,10 +148,50 @@ export default function Enquiry() {
     });
   };
 
+  // Apply a set of field changes, clear errors for any fields that are no
+  // longer applicable/valid, then re-validate the touched fields.
+  const applyChanges = (patch, touched) => {
+    const nextValues = { ...values, ...patch };
+    setValues(nextValues);
+    setErrors((prev) => {
+      const next = { ...prev };
+      // Drop stale errors on fields that are conditionally hidden or reset.
+      if (!showConfiguration(nextValues)) delete next.configuration;
+      if (!showFurnishing(nextValues)) delete next.furnishing;
+      if (!showPurpose(nextValues)) delete next.purpose;
+      touched.forEach((name) => {
+        if (!next[name]) return;
+        const message = getFieldError(name, nextValues, locations);
+        if (message) next[name] = message;
+        else delete next[name];
+      });
+      return next;
+    });
+  };
+
   const setField = (name, value) => {
     const nextValues = { ...values, [name]: value };
     setValues(nextValues);
     revalidateIfShown(name, nextValues, locations);
+  };
+
+  // Requirement drives budget bands, furnishing and purpose visibility —
+  // reset the dependent selections so a stale value can't be submitted.
+  const setRequirement = (value) => {
+    const wasRent = values.requirement === "Rent";
+    const isRent = value === "Rent";
+    const patch = { requirement: value };
+    if (wasRent !== isRent) patch.budget = ""; // budget bands change
+    if (!isRent) patch.furnishing = ""; // furnishing is rent-only
+    if (value === "Pre-Lease") patch.purpose = ""; // purpose hidden
+    applyChanges(patch, ["requirement", "budget"]);
+  };
+
+  // Category drives whether Configuration (BHK) applies.
+  const setPropertyCategory = (value) => {
+    const patch = { propertyCategory: value };
+    if (!bhkCategories.includes(value)) patch.configuration = "";
+    applyChanges(patch, ["propertyCategory"]);
   };
 
   const setLocationsAndRevalidate = (next) => {
@@ -115,17 +223,25 @@ export default function Enquiry() {
     }
     setErrors({});
 
-    // Build the payload mapped to Google Form entry IDs.
+    // Build the payload mapped to Google Form entry IDs — each field posts to
+    // its own column. Conditionally-hidden fields are omitted so they land blank.
+    const f = GOOGLE_FORM.fields;
     const data = new FormData();
-    data.append(GOOGLE_FORM.fields.fullName, values.fullName);
-    data.append(GOOGLE_FORM.fields.whatsapp, values.whatsapp);
-    data.append(GOOGLE_FORM.fields.requirement, values.requirement);
+    data.append(f.fullName, values.fullName);
+    data.append(f.whatsapp, values.whatsapp);
+    data.append(f.requirement, values.requirement);
+    if (values.email.trim()) data.append(f.email, values.email.trim());
+    data.append(f.propertyCategory, values.propertyCategory);
+    if (showConfiguration(values)) data.append(f.configuration, values.configuration);
+    data.append(f.budget, values.budget);
+    if (showPurpose(values)) data.append(f.purpose, values.purpose);
     data.append(GOOGLE_FORM.locationEntry, locations.join(", "));
-
-    let details = `Property Type: ${values.propertyType}`;
+    data.append(f.timeline, values.timeline);
+    if (showFurnishing(values)) data.append(f.furnishing, values.furnishing);
+    if (values.source) data.append(f.source, values.source);
+    data.append(f.consent, "Yes");
     const freeText = values.details.trim();
-    if (freeText) details += `\nDetails: ${freeText}`;
-    data.append(GOOGLE_FORM.detailsEntry, details);
+    if (freeText) data.append(GOOGLE_FORM.detailsEntry, freeText);
 
     setSubmitting(true);
     try {
@@ -157,6 +273,8 @@ export default function Enquiry() {
       </small>
     ) : null;
 
+  const budgetOptions = budgetOptionsFor(values);
+
   return (
     <section className="enquiry" id="contact">
       <div className="container">
@@ -166,6 +284,7 @@ export default function Enquiry() {
         </Reveal>
 
         <Reveal as="form" className="enquiry-form" id="enquiryForm" noValidate onSubmit={handleSubmit}>
+          {/* Full Name + WhatsApp Number */}
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="fullName">
@@ -204,10 +323,30 @@ export default function Enquiry() {
             </div>
           </div>
 
+          {/* Email + Requirement Type */}
           <div className="form-row">
             <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="e.g. rohan@email.com"
+                autoComplete="email"
+                className={cls("email")}
+                aria-invalid={!!errors.email}
+                value={values.email}
+                onChange={(e) => setField("email", e.target.value)}
+              />
+              {errors.email ? (
+                <FieldError name="email" />
+              ) : (
+                <small className="field-hint">Optional — for brochures &amp; shortlists.</small>
+              )}
+            </div>
+            <div className="form-group">
               <label htmlFor="requirement">
-                Property Requirement Type <span aria-hidden="true">*</span>
+                Requirement Type <span aria-hidden="true">*</span>
               </label>
               <select
                 id="requirement"
@@ -215,7 +354,7 @@ export default function Enquiry() {
                 className={cls("requirement")}
                 aria-invalid={!!errors.requirement}
                 value={values.requirement}
-                onChange={(e) => setField("requirement", e.target.value)}
+                onChange={(e) => setRequirement(e.target.value)}
               >
                 <option value="" disabled>Select requirement</option>
                 {requirementOptions.map((opt) => (
@@ -224,27 +363,97 @@ export default function Enquiry() {
               </select>
               <FieldError name="requirement" />
             </div>
+          </div>
+
+          {/* Property Category + Configuration (conditional) */}
+          <div className="form-row">
             <div className="form-group">
-              <label htmlFor="propertyType">
-                Property Type <span aria-hidden="true">*</span>
+              <label htmlFor="propertyCategory">
+                Property Category <span aria-hidden="true">*</span>
               </label>
               <select
-                id="propertyType"
-                name="propertyType"
-                className={cls("propertyType")}
-                aria-invalid={!!errors.propertyType}
-                value={values.propertyType}
-                onChange={(e) => setField("propertyType", e.target.value)}
+                id="propertyCategory"
+                name="propertyCategory"
+                className={cls("propertyCategory")}
+                aria-invalid={!!errors.propertyCategory}
+                value={values.propertyCategory}
+                onChange={(e) => setPropertyCategory(e.target.value)}
               >
-                <option value="" disabled>Select property type</option>
-                {propertyTypeOptions.map((opt) => (
+                <option value="" disabled>Select category</option>
+                {propertyCategoryOptions.map((opt) => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
-              <FieldError name="propertyType" />
+              <FieldError name="propertyCategory" />
             </div>
+            {showConfiguration(values) && (
+              <div className="form-group">
+                <label htmlFor="configuration">
+                  Configuration <span aria-hidden="true">*</span>
+                </label>
+                <select
+                  id="configuration"
+                  name="configuration"
+                  className={cls("configuration")}
+                  aria-invalid={!!errors.configuration}
+                  value={values.configuration}
+                  onChange={(e) => setField("configuration", e.target.value)}
+                >
+                  <option value="" disabled>Select configuration</option>
+                  {configurationOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+                <FieldError name="configuration" />
+              </div>
+            )}
           </div>
 
+          {/* Budget Range + Purpose (conditional) */}
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="budget">
+                Budget Range <span aria-hidden="true">*</span>
+              </label>
+              <select
+                id="budget"
+                name="budget"
+                className={cls("budget")}
+                aria-invalid={!!errors.budget}
+                value={values.budget}
+                onChange={(e) => setField("budget", e.target.value)}
+              >
+                <option value="" disabled>Select budget range</option>
+                {budgetOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+              <FieldError name="budget" />
+            </div>
+            {showPurpose(values) && (
+              <div className="form-group">
+                <label htmlFor="purpose">
+                  Purpose <span aria-hidden="true">*</span>
+                </label>
+                <select
+                  id="purpose"
+                  name="purpose"
+                  className={cls("purpose")}
+                  aria-invalid={!!errors.purpose}
+                  value={values.purpose}
+                  onChange={(e) => setField("purpose", e.target.value)}
+                >
+                  <option value="" disabled>Select purpose</option>
+                  {purposeOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+                <FieldError name="purpose" />
+              </div>
+            )}
+          </div>
+
+          {/* Preferred Property Location */}
           <div className="form-group">
             <span className="group-label" id="locationLabel">
               Preferred Property Location <span aria-hidden="true">*</span>
@@ -261,17 +470,95 @@ export default function Enquiry() {
             )}
           </div>
 
+          {/* Timeline + Furnishing (conditional) */}
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="timeline">
+                Timeline to Move / Close <span aria-hidden="true">*</span>
+              </label>
+              <select
+                id="timeline"
+                name="timeline"
+                className={cls("timeline")}
+                aria-invalid={!!errors.timeline}
+                value={values.timeline}
+                onChange={(e) => setField("timeline", e.target.value)}
+              >
+                <option value="" disabled>Select timeline</option>
+                {timelineOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+              <FieldError name="timeline" />
+            </div>
+            {showFurnishing(values) && (
+              <div className="form-group">
+                <label htmlFor="furnishing">
+                  Furnishing Preference <span aria-hidden="true">*</span>
+                </label>
+                <select
+                  id="furnishing"
+                  name="furnishing"
+                  className={cls("furnishing")}
+                  aria-invalid={!!errors.furnishing}
+                  value={values.furnishing}
+                  onChange={(e) => setField("furnishing", e.target.value)}
+                >
+                  <option value="" disabled>Select furnishing</option>
+                  {furnishingOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+                <FieldError name="furnishing" />
+              </div>
+            )}
+          </div>
+
+          {/* How did you find us? (optional) */}
+          <div className="form-group">
+            <label htmlFor="source">How did you find us?</label>
+            <select
+              id="source"
+              name="source"
+              value={values.source}
+              onChange={(e) => setField("source", e.target.value)}
+            >
+              <option value="">Select an option (optional)</option>
+              {sourceOptions.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Additional Details */}
           <div className="form-group">
             <label htmlFor="details">Additional Details</label>
             <textarea
               id="details"
               name="details"
               rows="4"
-              placeholder="Tell us more — budget, specific society/area, amenities, timeline, etc."
+              placeholder="Anything else we should know — specific society, amenities, urgency, etc."
               value={values.details}
               onChange={(e) => setField("details", e.target.value)}
             />
           </div>
+
+          {/* Consent */}
+          <div className={`form-consent${errors.consent ? " invalid" : ""}`}>
+            <input
+              type="checkbox"
+              id="consent"
+              name="consent"
+              checked={values.consent}
+              aria-invalid={!!errors.consent}
+              onChange={(e) => setField("consent", e.target.checked)}
+            />
+            <label htmlFor="consent">
+              I agree to be contacted via WhatsApp/call regarding this enquiry.
+              <span aria-hidden="true"> *</span>
+            </label>
+          </div>
+          <FieldError name="consent" />
 
           <button
             type="submit"

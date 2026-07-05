@@ -73,15 +73,69 @@ export const navLinks = [
 
 export const requirementOptions = ["Buy", "Rent", "Pre-Lease"];
 
-export const propertyTypeOptions = [
+export const propertyCategoryOptions = [
+  "Flat/Apartment",
+  "Villa",
+  "Bungalow",
+  "Row House",
+  "Plot/Land",
+  "Commercial/Office",
+];
+
+// Categories for which a BHK configuration is relevant. Plot/Land and
+// Commercial/Office are intentionally excluded — the Configuration field is
+// hidden for those.
+export const bhkCategories = [
+  "Flat/Apartment",
+  "Villa",
+  "Bungalow",
+  "Row House",
+];
+
+export const configurationOptions = [
+  "1 BHK",
   "2 BHK",
   "3 BHK",
   "4 BHK",
-  "Luxury Flat",
-  "Villa",
-  "Bungalow",
-  "Plot",
-  "Pre-Lease Property",
+  "4+ BHK",
+];
+
+// Budget ranges swap depending on the requirement type (Rent uses monthly rent
+// bands, Buy/Pre-Lease use sale-price bands).
+export const buyBudgetOptions = [
+  "Under ₹50L",
+  "₹50L – ₹1Cr",
+  "₹1Cr – ₹2Cr",
+  "₹2Cr – ₹5Cr",
+  "₹5Cr+",
+];
+
+export const rentBudgetOptions = [
+  "Under ₹15,000/month",
+  "₹15,000 – ₹30,000/month",
+  "₹30,000 – ₹50,000/month",
+  "₹50,000 – ₹1,00,000/month",
+  "₹1,00,000+/month",
+];
+
+export const purposeOptions = ["Self-use", "Investment"];
+
+export const timelineOptions = [
+  "Immediate",
+  "1–3 months",
+  "3–6 months",
+  "Just exploring",
+];
+
+export const furnishingOptions = ["Furnished", "Semi-furnished", "Unfurnished"];
+
+export const sourceOptions = [
+  "Instagram",
+  "Facebook",
+  "Google Search",
+  "Referral",
+  "Signboard/Walk-in",
+  "Other",
 ];
 
 export const locationOptions = [
@@ -105,6 +159,15 @@ export const GOOGLE_FORM = {
     fullName: "entry.959408424",
     whatsapp: "entry.254660384",
     requirement: "entry.2037999976",
+    email: "entry.1412848508",
+    propertyCategory: "entry.721090552",
+    configuration: "entry.1067735460",
+    budget: "entry.1797993296",
+    purpose: "entry.1991310664",
+    timeline: "entry.1796205361",
+    furnishing: "entry.1482183831",
+    source: "entry.1159073300",
+    consent: "entry.1849267595",
   },
   detailsEntry: "entry.1188830922",
   locationEntry: "entry.924428044",

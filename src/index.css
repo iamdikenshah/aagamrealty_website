@@ -656,7 +656,9 @@ section { padding: 72px 0; }
   border-color: #e11d48;
   box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.12);
 }
-.enquiry-form .form-group:last-of-type { margin-bottom: 20px; }
+/* Standalone (full-width) groups match the 20px rhythm of .form-row.
+   Groups nested inside a .form-row are spaced by the row itself. */
+.enquiry-form > .form-group { margin-bottom: 20px; }
 
 /* Location multi-select dropdown */
 .group-label {
@@ -755,6 +757,34 @@ section { padding: 72px 0; }
   color: #e11d48;
 }
 .field-error i { font-size: 12px; }
+
+/* Consent checkbox */
+.form-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 4px 0 20px;
+}
+.form-consent input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  flex-shrink: 0;
+  accent-color: var(--purple);
+  cursor: pointer;
+}
+.form-consent label {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--charcoal);
+  cursor: pointer;
+}
+.form-consent label span { color: var(--purple); }
+.form-consent.invalid input { outline: 2px solid #e11d48; outline-offset: 2px; }
+.form-consent + .field-error { margin: -12px 0 16px; }
+
 .enquiry-form .btn { width: 100%; margin-top: 4px; }
 .form-status {
   margin-top: 16px;
