@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, navigate } from "../router.jsx";
 import PropertyEnquiryForm from "../components/property/PropertyEnquiryForm";
+import PropertyLightbox from "../components/property/PropertyLightbox";
 import {
   getPropertyById,
   LISTING_TYPE_LABELS,
@@ -32,10 +33,12 @@ const FAQS = [
 export default function PropertyDetail({ id }) {
   const [property, setProperty] = useState(undefined); // undefined = loading, null = not found
   const [activeConfig, setActiveConfig] = useState(null);
+  const [lightboxIndex, setLightboxIndex] = useState(null); // null = closed, number = open at index
 
   useEffect(() => {
     let active = true;
     setProperty(undefined);
+    setLightboxIndex(null);
     getPropertyById(id).then((p) => {
       if (active) setProperty(p);
     });
@@ -76,8 +79,12 @@ export default function PropertyDetail({ id }) {
           <span>{property.title}</span>
         </nav>
 
-        {/* 1. Hero gallery */}
-        <Gallery images={property.images} title={property.title} />
+        {/* 1. Hero gallery — driven by the same categorised `gallery` as the lightbox */}
+        <Gallery
+          images={property.gallery?.map((g) => g.url) ?? []}
+          title={property.title}
+          onOpen={property.gallery?.length ? (i) => setLightboxIndex(i) : undefined}
+        />
 
         {/* 2. Title / type / price */}
         <header className="prop-detail__head">
@@ -207,7 +214,7 @@ export default function PropertyDetail({ id }) {
             {/* 10. Gallery with category tabs */}
             {property.gallery?.length > 0 && (
               <Section id="gallery" title="Gallery">
-                <CategoryGallery gallery={property.gallery} />
+                <CategoryGallery gallery={property.gallery} onOpen={setLightboxIndex} />
               </Section>
             )}
 
@@ -226,19 +233,33 @@ export default function PropertyDetail({ id }) {
               </Section>
             )}
 
-            {/* 12. Location map (placeholder) */}
+            {/* 12. Location map */}
             {property.location && (
               <Section id="location" title="Location">
                 <div className="prop-map">
-                  <div className="prop-map__pin"><i className="fa-solid fa-location-dot" aria-hidden="true" /></div>
-                  <p className="prop-map__addr">{property.location.address}</p>
-                  <a
-                    className="btn btn-outline"
-                    href={`https://www.google.com/maps/search/?api=1&query=${property.location.lat},${property.location.lng}`}
-                    target="_blank" rel="noopener noreferrer"
-                  >
-                    Open in Google Maps
-                  </a>
+                  <iframe
+                    className="prop-map__frame"
+                    title={`Map — ${property.location.address}`}
+                    src={`https://www.google.com/maps?q=${encodeURIComponent(property.location.address)}&output=embed`}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    allowFullScreen
+                  />
+                  <div className="prop-map__foot">
+                    <p className="prop-map__addr">
+                      <i className="fa-solid fa-location-dot" aria-hidden="true" />
+                      {property.location.address}
+                    </p>
+                    {property.location.mapUrl && (
+                      <a
+                        className="btn btn-outline"
+                        href={property.location.mapUrl}
+                        target="_blank" rel="noopener noreferrer"
+                      >
+                        <i className="fa-solid fa-map-location-dot" aria-hidden="true" /> Open in Google Maps
+                      </a>
+                    )}
+                  </div>
                 </div>
               </Section>
             )}
@@ -291,6 +312,15 @@ export default function PropertyDetail({ id }) {
           </button>
         </div>
       </div>
+
+      {lightboxIndex !== null && property.gallery?.length > 0 && (
+        <PropertyLightbox
+          gallery={property.gallery}
+          title={property.title}
+          startIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </article>
   );
 }
@@ -306,13 +336,23 @@ function Section({ id, title, children }) {
   );
 }
 
-function Gallery({ images = [], title }) {
+function Gallery({ images = [], title, onOpen }) {
   const [active, setActive] = useState(0);
   if (!images.length) return null;
   return (
     <div className="prop-hero">
-      <div className="prop-hero__main">
-        <img src={images[active]} alt={`${title} — image ${active + 1}`} />
+      <div className={`prop-hero__main${onOpen ? " prop-hero__main--zoom" : ""}`}>
+        <img
+          src={images[active]}
+          alt={`${title} — image ${active + 1}`}
+          onClick={onOpen ? () => onOpen(active) : undefined}
+          role={onOpen ? "button" : undefined}
+        />
+        {onOpen && (
+          <button type="button" className="prop-hero__expand" onClick={() => onOpen(active)} aria-label="View all photos">
+            <i className="fa-solid fa-expand" aria-hidden="true" /> View all photos
+          </button>
+        )}
         {images.length > 1 && (
           <>
             <button className="prop-hero__nav prop-hero__nav--prev" aria-label="Previous image"
@@ -340,13 +380,16 @@ function Gallery({ images = [], title }) {
   );
 }
 
-function CategoryGallery({ gallery }) {
+function CategoryGallery({ gallery, onOpen }) {
   const categories = useMemo(
     () => ["All", ...new Set(gallery.map((g) => g.category))],
     [gallery]
   );
   const [cat, setCat] = useState("All");
-  const shown = cat === "All" ? gallery : gallery.filter((g) => g.category === cat);
+  // Keep original global indices so a click opens the lightbox at the right image.
+  const shown = gallery
+    .map((g, index) => ({ ...g, index }))
+    .filter((g) => cat === "All" || g.category === cat);
 
   return (
     <div>
@@ -358,11 +401,18 @@ function CategoryGallery({ gallery }) {
         ))}
       </div>
       <div className="prop-gallery__grid">
-        {shown.map((g, i) => (
-          <figure className="prop-gallery__item" key={`${g.url}-${i}`}>
-            <img src={g.url} alt={g.category} loading="lazy" />
-            <figcaption>{g.category}</figcaption>
-          </figure>
+        {shown.map((g) => (
+          <button
+            type="button"
+            className="prop-gallery__item"
+            key={`${g.url}-${g.index}`}
+            onClick={() => onOpen?.(g.index)}
+            aria-label={`View ${g.caption || g.category}`}
+          >
+            <img src={g.url} alt={g.caption || g.category} loading="lazy" />
+            <span className="prop-gallery__zoom" aria-hidden="true"><i className="fa-solid fa-magnifying-glass-plus" /></span>
+            <span className="prop-gallery__cap">{g.caption || g.category}</span>
+          </button>
         ))}
       </div>
     </div>
