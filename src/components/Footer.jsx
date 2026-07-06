@@ -1,6 +1,7 @@
 import { navLinks, footerLocalities } from "../data/content";
 import { Link, navigate } from "../router.jsx";
 import { openEnquiry } from "../enquiryStore";
+import { track } from "../analytics";
 
 export default function Footer() {
   return (
@@ -24,10 +25,11 @@ export default function Footer() {
                   <a
                     href={link.href}
                     onClick={(e) => {
+                      track("footer_link_click", { label: link.label, href: link.href });
                       // "Contact" opens the enquiry popup.
                       if (link.href === "#contact") {
                         e.preventDefault();
-                        openEnquiry();
+                        openEnquiry("footer");
                         return;
                       }
                       // Path links (e.g. /properties) do SPA navigation.
@@ -62,7 +64,10 @@ export default function Footer() {
             <ul className="footer-links">
               {footerLocalities.map((locality) => (
                 <li key={locality}>
-                  <Link to={`/properties?locality=${encodeURIComponent(locality)}`}>
+                  <Link
+                    to={`/properties?locality=${encodeURIComponent(locality)}`}
+                    onClick={() => track("footer_locality_click", { locality })}
+                  >
                     Property in {locality}
                   </Link>
                 </li>
@@ -78,6 +83,7 @@ export default function Footer() {
                 aria-label="Instagram"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => track("social_click", { network: "instagram" })}
               >
                 <i className="fa-brands fa-instagram" aria-hidden="true" />
               </a>
@@ -86,17 +92,18 @@ export default function Footer() {
                 aria-label="Facebook"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => track("social_click", { network: "facebook" })}
               >
                 <i className="fa-brands fa-facebook-f" aria-hidden="true" />
               </a>
             </div>
             <div className="footer-contact-item">
               <i className="fa-solid fa-phone" aria-hidden="true" />
-              <a href="tel:+919227100299">+91 92271 00299</a>
+              <a href="tel:+919227100299" onClick={() => track("contact_click", { method: "phone", location: "footer" })}>+91 92271 00299</a>
             </div>
             <div className="footer-contact-item">
               <i className="fa-solid fa-envelope" aria-hidden="true" />
-              <a href="mailto:info@aagamrealty.com">info@aagamrealty.com</a>
+              <a href="mailto:info@aagamrealty.com" onClick={() => track("contact_click", { method: "email", location: "footer" })}>info@aagamrealty.com</a>
             </div>
           </div>
         </div>

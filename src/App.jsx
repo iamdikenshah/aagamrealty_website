@@ -94,7 +94,7 @@ export default function App() {
       // "#contact" no longer maps to a section — it opens the enquiry popup.
       if (id === "contact") {
         e.preventDefault();
-        openEnquiry();
+        openEnquiry("content_link");
         return;
       }
       const target = document.getElementById(id);

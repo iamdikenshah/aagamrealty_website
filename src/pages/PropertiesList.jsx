@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import PropertyCard from "../components/property/PropertyCard";
 import BudgetRange from "../components/property/BudgetRange";
+import { track } from "../analytics";
 import {
   getProperties,
   getFilterFacets,
@@ -85,6 +86,8 @@ export default function PropertiesList() {
   }, [filters]);
 
   const toggle = (key, value) => {
+    // Track outside the updater so StrictMode's double-invoke can't double-log.
+    track("filter_apply", { filter_type: key, filter_value: value, active: !filters[key].includes(value) });
     setFilters((prev) => {
       const set = new Set(prev[key]);
       set.has(value) ? set.delete(value) : set.add(value);
@@ -105,7 +108,15 @@ export default function PropertiesList() {
     setFilters((prev) => ({ ...prev, budgetMin, budgetMax }));
   const clearBudget = () => setFilters((prev) => ({ ...prev, budgetMin: null, budgetMax: null }));
 
-  const clearAll = () => setFilters(EMPTY_FILTERS);
+  const clearAll = () => {
+    track("filter_clear_all", { active_filters: chips.length });
+    setFilters(EMPTY_FILTERS);
+  };
+
+  const openFilterDrawer = () => {
+    track("filter_drawer_open", {});
+    setDrawerOpen(true);
+  };
 
   const showStageFilter = stageApplies(filters.transactions);
   // A ₹/month suffix only makes sense when the view is scoped to rentals.
@@ -221,7 +232,7 @@ export default function PropertiesList() {
           <button
             type="button"
             className="btn btn-outline prop-listing__filter-toggle"
-            onClick={() => setDrawerOpen(true)}
+            onClick={openFilterDrawer}
           >
             <i className="fa-solid fa-sliders" aria-hidden="true" /> Filters
             {chips.length > 0 && <span className="prop-listing__filter-count">{chips.length}</span>}

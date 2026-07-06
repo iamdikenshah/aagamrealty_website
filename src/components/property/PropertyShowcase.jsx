@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "../../router.jsx";
+import { track } from "../../analytics";
 import { getProperties } from "../../data/properties";
 import PropertyCard from "./PropertyCard";
 
@@ -35,6 +36,8 @@ export default function PropertyShowcase({
   // Nothing to show (e.g. filter matched no records) — skip the section entirely.
   if (items && items.length === 0) return null;
 
+  const trackViewAll = () => track("showcase_view_all", { section: id || title });
+
   return (
     <section className="prop-showcase" id={id}>
       <div className="container">
@@ -44,7 +47,7 @@ export default function PropertyShowcase({
             <h2 className="prop-showcase__title">{title}</h2>
             {subtitle && <p className="prop-showcase__sub">{subtitle}</p>}
           </div>
-          <Link to={viewAllTo} className="btn btn-outline prop-showcase__all">
+          <Link to={viewAllTo} className="btn btn-outline prop-showcase__all" onClick={trackViewAll}>
             {viewAllLabel} <i className="fa-solid fa-arrow-right" aria-hidden="true" />
           </Link>
         </div>
@@ -58,12 +61,12 @@ export default function PropertyShowcase({
         ) : (
           <div className="prop-showcase__grid">
             {items.map((p) => (
-              <PropertyCard key={p.id} property={p} />
+              <PropertyCard key={p.id} property={p} source="showcase" />
             ))}
           </div>
         )}
 
-        <Link to={viewAllTo} className="btn btn-primary prop-showcase__all-mobile">
+        <Link to={viewAllTo} className="btn btn-primary prop-showcase__all-mobile" onClick={trackViewAll}>
           {viewAllLabel}
         </Link>
       </div>

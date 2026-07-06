@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { navigate } from "../router.jsx";
+import { track } from "../analytics";
 import HeroSelect from "./HeroSelect";
 import {
   getFilterFacets,
@@ -60,11 +61,18 @@ export default function HeroSearch() {
     params.set("category", category);
     params.set("transaction", transaction);
     if (locality) params.set("locality", locality);
-    if (budget !== "") {
-      const band = bands[Number(budget)];
-      if (band?.min != null) params.set("budgetMin", String(band.min));
-      if (band?.max != null) params.set("budgetMax", String(band.max));
-    }
+    const band = budget !== "" ? bands[Number(budget)] : null;
+    if (band?.min != null) params.set("budgetMin", String(band.min));
+    if (band?.max != null) params.set("budgetMax", String(band.max));
+
+    track("property_search", {
+      source: "hero",
+      category,
+      transaction,
+      locality: locality || "any",
+      budget: band?.label || "any",
+    });
+
     navigate(`/properties?${params.toString()}`);
   };
 

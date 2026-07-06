@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { navLinks } from "../data/content";
 import { navigate, useLocation } from "../router.jsx";
 import { openEnquiry } from "../enquiryStore";
+import { track } from "../analytics";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -43,13 +44,16 @@ export default function Navbar() {
   // Handle a nav link click. Path links (e.g. "/properties") do SPA navigation.
   // Hash links (#section) scroll on the home page; from a sub-page they route
   // home first and then scroll to the target section.
-  const handleNavClick = (e, href) => {
+  const handleNavClick = (e, href, location = "navbar") => {
     setMenuOpen(false);
+
+    const label = navLinks.find((l) => l.href === href)?.label ?? href;
+    track("nav_link_click", { label, href, location });
 
     // "Contact" / "Get in Touch" opens the enquiry popup instead of navigating.
     if (href === "#contact") {
       e.preventDefault();
-      openEnquiry();
+      openEnquiry(location);
       return;
     }
 
@@ -109,11 +113,11 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       <nav className={`mobile-menu${menuOpen ? " open" : ""}`} id="mobileMenu" aria-label="Mobile">
         {navLinks.map((link) => (
-          <a key={link.href} href={link.href} onClick={(e) => handleNavClick(e, link.href)}>
+          <a key={link.href} href={link.href} onClick={(e) => handleNavClick(e, link.href, "mobile")}>
             {link.label}
           </a>
         ))}
-        <a href="#contact" className="btn btn-primary" onClick={(e) => handleNavClick(e, "#contact")}>Get in Touch</a>
+        <a href="#contact" className="btn btn-primary" onClick={(e) => handleNavClick(e, "#contact", "mobile")}>Get in Touch</a>
       </nav>
     </header>
   );

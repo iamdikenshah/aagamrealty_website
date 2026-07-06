@@ -3,14 +3,20 @@
 // the modal itself lives once at the App root.
 
 import { useSyncExternalStore } from "react";
+import { track } from "./analytics";
 
 let open = false;
 const listeners = new Set();
 const emit = () => listeners.forEach((fn) => fn());
 
-export function openEnquiry() {
+/**
+ * Open the enquiry modal. Pass a `source` (e.g. "navbar", "footer", "hero") so
+ * analytics can attribute which CTA drove the enquiry.
+ */
+export function openEnquiry(source = "unknown") {
   if (!open) {
     open = true;
+    track("enquiry_open", { source });
     emit();
   }
 }

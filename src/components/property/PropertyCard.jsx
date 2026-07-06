@@ -1,4 +1,5 @@
 import { Link } from "../../router.jsx";
+import { track } from "../../analytics";
 import {
   LISTING_TYPE_LABELS,
   formatPriceRange,
@@ -8,8 +9,11 @@ import {
 /**
  * A single listing card for the properties grid. Whole card is a link to the
  * detail page. Fields that don't apply to a listing type are simply omitted.
+ *
+ * @param {string} [source] Where the card is rendered ("listing", "showcase") —
+ *   passed to analytics so we can see which surfaces drive listing clicks.
  */
-export default function PropertyCard({ property }) {
+export default function PropertyCard({ property, source = "listing" }) {
   const {
     id, gallery, title, locality, city, listingType, projectStage,
     propertyType, purchaseType,
@@ -22,7 +26,12 @@ export default function PropertyCard({ property }) {
   const showStage = projectStage && listingType !== "rental" && listingType !== "land";
 
   return (
-    <Link to={`/property/${id}`} className="prop-card" aria-label={`${title}, ${locality}`}>
+    <Link
+      to={`/property/${id}`}
+      className="prop-card"
+      aria-label={`${title}, ${locality}`}
+      onClick={() => track("property_card_click", { property_id: id, property_title: title, listing_type: listingType, source })}
+    >
       <div className="prop-card__media">
         {hero ? (
           <img src={hero} alt={title} loading="lazy" />

@@ -23,7 +23,7 @@ export default function Hero() {
             className="btn btn-white-outline"
             onClick={(e) => {
               e.preventDefault();
-              openEnquiry();
+              openEnquiry("hero");
             }}
           >
             Contact Us
