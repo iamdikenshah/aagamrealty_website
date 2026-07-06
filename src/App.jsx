@@ -11,7 +11,7 @@ import WhatsAppFloat from "./components/WhatsAppFloat";
 import PropertyShowcase from "./components/property/PropertyShowcase";
 import PropertiesList from "./pages/PropertiesList";
 import PropertyDetail from "./pages/PropertyDetail";
-import { useLocation } from "./router.jsx";
+import { useLocation, navigate } from "./router.jsx";
 import { openEnquiry } from "./enquiryStore";
 
 // The original single-page marketing site (anchored sections).
@@ -45,13 +45,26 @@ function Home() {
   );
 }
 
+// Redirects to `path` on mount (used for bare/legacy URLs). Renders nothing.
+function Redirect({ to }) {
+  useEffect(() => {
+    navigate(to, { replace: true });
+  }, [to]);
+  return null;
+}
+
 // Map the current pathname to a view. Kept deliberately tiny — see router.jsx.
 function Router() {
   const path = useLocation();
 
   if (path === "/properties") return <PropertiesList />;
+  if (path === "/property" || path === "/property/") {
+    // Bare /property (no id) — send visitors to the full listing page.
+    return <Redirect to="/properties" />;
+  }
   if (path.startsWith("/property/")) {
     const id = decodeURIComponent(path.slice("/property/".length));
+    if (!id) return <Redirect to="/properties" />;
     return <PropertyDetail id={id} />;
   }
   return <Home />;

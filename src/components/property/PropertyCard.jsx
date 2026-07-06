@@ -11,11 +11,11 @@ import {
  */
 export default function PropertyCard({ property }) {
   const {
-    id, images, title, locality, city, listingType, projectStage,
+    id, gallery, title, locality, city, listingType, projectStage,
     propertyType, purchaseType,
   } = property;
 
-  const hero = images?.[0];
+  const hero = gallery?.[0]?.url;
   const configSummary = formatConfigSummary(property);
   // Show a stage tag only where it's meaningful (hidden for plain rentals/land
   // where it adds noise).
