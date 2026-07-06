@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, navigate } from "../router.jsx";
 import PropertyEnquiryForm from "../components/property/PropertyEnquiryForm";
 import PropertyLightbox from "../components/property/PropertyLightbox";
+import { track } from "../analytics";
 import {
   getPropertyById,
   LISTING_TYPE_LABELS,
@@ -40,7 +41,9 @@ export default function PropertyDetail({ id }) {
     setProperty(undefined);
     setLightboxIndex(null);
     getPropertyById(id).then((p) => {
-      if (active) setProperty(p);
+      if (!active) return;
+      setProperty(p);
+      if (p) track("property_view", { property_id: p.id, property_title: p.title });
     });
     return () => {
       active = false;
@@ -70,6 +73,16 @@ export default function PropertyDetail({ id }) {
 
   const isLand = property.listingType === "land";
 
+  // Open the fullscreen gallery at image `i` and log it.
+  const openLightbox = (i) => {
+    setLightboxIndex(i);
+    track("gallery_open", {
+      property_id: property.id,
+      image_index: i,
+      image_category: property.gallery?.[i]?.category,
+    });
+  };
+
   return (
     <article className="prop-detail">
       <div className="container">
@@ -83,7 +96,7 @@ export default function PropertyDetail({ id }) {
         <Gallery
           images={property.gallery?.map((g) => g.url) ?? []}
           title={property.title}
-          onOpen={property.gallery?.length ? (i) => setLightboxIndex(i) : undefined}
+          onOpen={property.gallery?.length ? openLightbox : undefined}
         />
 
         {/* 2. Title / type / price */}
@@ -214,7 +227,7 @@ export default function PropertyDetail({ id }) {
             {/* 10. Gallery with category tabs */}
             {property.gallery?.length > 0 && (
               <Section id="gallery" title="Gallery">
-                <CategoryGallery gallery={property.gallery} onOpen={setLightboxIndex} />
+                <CategoryGallery gallery={property.gallery} onOpen={openLightbox} />
               </Section>
             )}
 

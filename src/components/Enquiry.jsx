@@ -15,6 +15,7 @@ import {
   furnishingOptions,
   sourceOptions,
 } from "../data/content";
+import { track } from "../analytics";
 
 const EMPTY_FORM = {
   segment: "",
@@ -270,6 +271,12 @@ export default function EnquiryForm() {
     try {
       // no-cors: submission succeeds; the response is opaque.
       await fetch(GOOGLE_FORM.action, { method: "POST", mode: "no-cors", body: data });
+      track("enquiry_submitted", {
+        source: "main_form",
+        segment: values.segment || undefined,
+        requirement: values.requirement || undefined,
+        property_category: values.propertyCategory || undefined,
+      });
       setStatus({
         type: "success",
         message: "Thank you! Your enquiry has been sent. We'll reach out shortly.",

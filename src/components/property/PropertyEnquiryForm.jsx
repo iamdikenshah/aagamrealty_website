@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { GOOGLE_FORM, whatsappLink } from "../../data/content";
 import { CATEGORY_LABELS, TRANSACTION_LABELS } from "../../data/properties";
+import { track } from "../../analytics";
 
 const EMPTY = { name: "", phone: "", email: "", message: "" };
 
@@ -84,6 +85,12 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
     setFailed(false);
     try {
       await fetch(GOOGLE_FORM.action, { method: "POST", mode: "no-cors", body: data });
+      track("enquiry_submitted", {
+        source: "property_form",
+        property_id: property.id,
+        property_title: property.title,
+        configuration: prefillConfig || undefined,
+      });
       setSent(true);
     } catch {
       setFailed(true);
@@ -98,7 +105,8 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
         <div className="prop-enquiry__tick"><i className="fa-solid fa-circle-check" aria-hidden="true" /></div>
         <h3>Thank you!</h3>
         <p>We've received your enquiry for <strong>{property.title}</strong> and will get back to you shortly.</p>
-        <a className="btn prop-enquiry__wa" href={waHref} target="_blank" rel="noopener noreferrer">
+        <a className="btn prop-enquiry__wa" href={waHref} target="_blank" rel="noopener noreferrer"
+          onClick={() => track("whatsapp_click", { location: "property_form_done", property_id: property.id })}>
           <i className="fa-brands fa-whatsapp" aria-hidden="true" /> Chat on WhatsApp
         </a>
       </div>
@@ -139,7 +147,8 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
       <button type="submit" className="btn btn-primary prop-enquiry__submit" disabled={submitting}>
         {submitting ? "Sending…" : "Enquire Now"}
       </button>
-      <a className="btn prop-enquiry__wa" href={waHref} target="_blank" rel="noopener noreferrer">
+      <a className="btn prop-enquiry__wa" href={waHref} target="_blank" rel="noopener noreferrer"
+        onClick={() => track("whatsapp_click", { location: "property_form", property_id: property.id })}>
         <i className="fa-brands fa-whatsapp" aria-hidden="true" /> Chat on WhatsApp
       </a>
       {failed && (

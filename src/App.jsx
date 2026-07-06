@@ -13,6 +13,7 @@ import PropertiesList from "./pages/PropertiesList";
 import PropertyDetail from "./pages/PropertyDetail";
 import { useLocation, navigate } from "./router.jsx";
 import { openEnquiry } from "./enquiryStore";
+import { trackPageView } from "./analytics";
 
 // The original single-page marketing site (anchored sections).
 function Home() {
@@ -56,6 +57,13 @@ function Redirect({ to }) {
 // Map the current pathname to a view. Kept deliberately tiny — see router.jsx.
 function Router() {
   const path = useLocation();
+
+  // Log a page_view on each SPA navigation (GA4 only auto-logs the first load).
+  // A microtask defer lets the target page set document.title before we read it.
+  useEffect(() => {
+    const t = setTimeout(() => trackPageView(path), 0);
+    return () => clearTimeout(t);
+  }, [path]);
 
   if (path === "/properties") return <PropertiesList />;
   if (path === "/property" || path === "/property/") {

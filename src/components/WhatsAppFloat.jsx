@@ -1,4 +1,5 @@
 import { WHATSAPP_LINK } from "../data/content";
+import { track } from "../analytics";
 
 export default function WhatsAppFloat() {
   return (
@@ -8,6 +9,7 @@ export default function WhatsAppFloat() {
       target="_blank"
       rel="noopener"
       aria-label="Chat with us on WhatsApp"
+      onClick={() => track("whatsapp_click", { location: "float" })}
     >
       <i className="fa-brands fa-whatsapp" aria-hidden="true" />
       <span className="whatsapp-float-tooltip">Chat with us</span>
