@@ -34,6 +34,18 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # Firebase Analytics config — Vite inlines these VITE_* vars at build
+          # time. Add each as a repo secret (Settings → Secrets and variables →
+          # Actions). They are public client identifiers, not secrets; kept out
+          # of the repo only for per-environment config. Missing = analytics off.
+          VITE_FB_API_KEY: ${{ secrets.VITE_FB_API_KEY }}
+          VITE_FB_AUTH_DOMAIN: ${{ secrets.VITE_FB_AUTH_DOMAIN }}
+          VITE_FB_PROJECT_ID: ${{ secrets.VITE_FB_PROJECT_ID }}
+          VITE_FB_STORAGE_BUCKET: ${{ secrets.VITE_FB_STORAGE_BUCKET }}
+          VITE_FB_MESSAGING_SENDER_ID: ${{ secrets.VITE_FB_MESSAGING_SENDER_ID }}
+          VITE_FB_APP_ID: ${{ secrets.VITE_FB_APP_ID }}
+          VITE_FB_MEASUREMENT_ID: ${{ secrets.VITE_FB_MEASUREMENT_ID }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
