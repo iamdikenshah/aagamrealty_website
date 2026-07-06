@@ -81,7 +81,7 @@ export default function Navbar() {
     <header className={`navbar${scrolled ? " scrolled" : ""}`} id="navbar">
       <div className="container nav-inner">
         <a href="#home" className="logo" aria-label="Aagam Realty home" onClick={handleLogoClick}>
-          <img src="/images/app_header_logo.png" alt="Aagam Realty" className="logo-img" />
+          <img src="/images/app_header_logo.png" alt="Aagam Realty" className="logo-img" width="1288" height="512" fetchPriority="high" decoding="async" />
         </a>
 
         <nav aria-label="Primary">

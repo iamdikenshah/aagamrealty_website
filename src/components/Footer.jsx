@@ -9,7 +9,15 @@ export default function Footer() {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
-            <img src="/images/app_logo_footer.png" alt="Aagam Realty" className="footer-logo-img" />
+            <img
+              src="/images/app_logo_footer.png"
+              alt="Aagam Realty"
+              className="footer-logo-img"
+              width="609"
+              height="176"
+              loading="lazy"
+              decoding="async"
+            />
             <p>
               Your trusted real estate partner — helping you rent, buy, invest, and build with
               confidence.
