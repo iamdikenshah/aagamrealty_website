@@ -110,8 +110,10 @@ export default function PropertyLightbox({ gallery, title, startIndex = 0, onClo
 
         <figure className="prop-lightbox__figure">
           <div className="prop-lightbox__imgwrap">
-            <img src={active.url} alt={active.caption || active.category} />
-            {active.tag && <span className="prop-lightbox__tag">{active.tag}</span>}
+            <span className="prop-lightbox__imgbox">
+              <img src={active.url} alt={active.caption || active.category} />
+              {active.tag && <span className="prop-lightbox__tag">{active.tag}</span>}
+            </span>
           </div>
           {active.caption && <figcaption className="prop-lightbox__caption">{active.caption}</figcaption>}
         </figure>
