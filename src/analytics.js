@@ -36,7 +36,15 @@ const queue = [];
 
 async function init() {
   // No measurement id → analytics not configured for this build; stay a no-op.
-  if (!config.measurementId) return;
+  if (!config.measurementId) {
+    if (import.meta.env.DEV) {
+      console.warn(
+        "[analytics] disabled — VITE_FB_MEASUREMENT_ID is not set. " +
+          "Create a .env.local from .env.example with your Firebase config and restart `npm run dev`."
+      );
+    }
+    return;
+  }
   try {
     const [{ initializeApp }, { getAnalytics, isSupported, logEvent }] = await Promise.all([
       import("firebase/app"),
@@ -62,6 +70,8 @@ init();
  * @param {object} [params] Event parameters.
  */
 export function track(name, params = {}) {
+  // Dev feedback: see every event in the console even before Firebase confirms.
+  if (import.meta.env.DEV) console.debug("[analytics]", name, params);
   if (analytics && logEventFn) logEventFn(analytics, name, params);
   else if (config.measurementId) queue.push([name, params]);
 }
