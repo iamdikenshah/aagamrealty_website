@@ -292,6 +292,9 @@
 
 /* Two-column layout with sticky enquiry */
 .prop-detail__grid { display: grid; grid-template-columns: 1fr 360px; gap: 40px; align-items: start; margin-top: 8px; }
+/* Let the columns shrink below their widest child (e.g. the 560px towers table)
+   so a wide descendant can't push the whole page past the viewport on mobile. */
+.prop-detail__main, .prop-detail__aside { min-width: 0; }
 .prop-detail__sticky { position: sticky; top: 88px; }
 
 .prop-section { padding: 28px 0; border-bottom: 1px solid var(--light-gray); scroll-margin-top: 88px; }
