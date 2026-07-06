@@ -34,6 +34,13 @@ let logEventFn = null;
 // on the very first page load.
 const queue = [];
 
+// Send one event to Firebase. In dev we tag `debug_mode: true` so events stream
+// into the Firebase console's DebugView / GA4 Realtime instantly; production
+// events go through unmodified.
+function emit(name, params) {
+  logEventFn(analytics, name, import.meta.env.DEV ? { ...params, debug_mode: true } : params);
+}
+
 async function init() {
   // No measurement id → analytics not configured for this build; stay a no-op.
   if (!config.measurementId) {
@@ -55,7 +62,7 @@ async function init() {
     analytics = getAnalytics(app);
     logEventFn = logEvent;
     // Flush anything queued while the SDK was loading.
-    queue.splice(0).forEach(([name, params]) => logEvent(analytics, name, params));
+    queue.splice(0).forEach(([name, params]) => emit(name, params));
   } catch {
     /* analytics unavailable — ignore */
   }
@@ -72,7 +79,7 @@ init();
 export function track(name, params = {}) {
   // Dev feedback: see every event in the console even before Firebase confirms.
   if (import.meta.env.DEV) console.debug("[analytics]", name, params);
-  if (analytics && logEventFn) logEventFn(analytics, name, params);
+  if (analytics && logEventFn) emit(name, params);
   else if (config.measurementId) queue.push([name, params]);
 }
 
