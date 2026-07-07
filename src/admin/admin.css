@@ -281,6 +281,11 @@
 .admin-json { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.82rem; }
 .admin-json.is-invalid { border-color: #c0392b; }
 
+/* Enquiry form: a steady two-column layout so labels/inputs line up cleanly
+   (the shared auto-fit grid can spill to 3–4 cramped columns on wide screens). */
+.admin-enqform .admin-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 18px; align-items: start; }
+@media (max-width: 560px) { .admin-enqform .admin-grid { grid-template-columns: 1fr; } }
+
 /* Segmented control (enquiry form: Residential / Commercial) */
 .admin-segmented { display: flex; gap: 10px; flex-wrap: wrap; }
 .admin-segmented__opt {

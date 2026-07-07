@@ -124,6 +124,7 @@ const VALIDATED = [
   "configuration", "budget", "purpose", "locations", "timeline", "furnishing",
 ];
 
+// Input/select fields use a <label> (clicking the label focuses the control).
 function Field({ label, error, children, wide, hint }) {
   return (
     <label className={`admin-field${wide ? " admin-field--wide" : ""}${error ? " admin-field--invalid" : ""}`}>
@@ -132,6 +133,19 @@ function Field({ label, error, children, wide, hint }) {
       {hint && !error && <small className="admin-field__hint-sm">{hint}</small>}
       {error && <small className="admin-field__err">{error}</small>}
     </label>
+  );
+}
+
+// Custom controls (segmented radios, multi-select) use a <div> so clicking the
+// label text doesn't forward a click into the first button.
+function FieldBlock({ label, error, children, wide, hint }) {
+  return (
+    <div className={`admin-field${wide ? " admin-field--wide" : ""}${error ? " admin-field--invalid" : ""}`}>
+      <span>{label}</span>
+      {children}
+      {hint && !error && <small className="admin-field__hint-sm">{hint}</small>}
+      {error && <small className="admin-field__err">{error}</small>}
+    </div>
   );
 }
 
@@ -217,35 +231,57 @@ export default function EnquiryForm({ properties = [], saving, onSubmit, onCance
   };
 
   return (
-    <form className="admin-form" onSubmit={handleSubmit} noValidate>
-      {/* ---- Lead: mirrors the public enquiry form ---- */}
-      <div className="admin-form__section">
-        <h2 className="admin-form__legend">Requirement</h2>
-
-        <Field label="Looking for *" error={errors.segment}>
-          <div className={`admin-segmented${errors.segment ? " is-invalid" : ""}`} role="radiogroup" aria-label="Segment">
-            {segmentOptions.map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                role="radio"
-                aria-checked={values.segment === opt}
-                className={`admin-segmented__opt${values.segment === opt ? " active" : ""}`}
-                onClick={() => setSegment(opt)}
-              >
-                <i className={`fa-solid ${opt === "Commercial" ? "fa-building" : "fa-house-chimney"}`} aria-hidden="true" />
-                {opt}
-              </button>
-            ))}
-          </div>
-        </Field>
-
+    <form className="admin-form admin-enqform" onSubmit={handleSubmit} noValidate>
+      {/* ---- Contact ---- */}
+      <section className="admin-form__section">
+        <h2 className="admin-form__legend">Contact</h2>
         <div className="admin-grid">
-          <Field label="Requirement type *" error={errors.requirement}>
+          <Field label="Full name *" error={errors.fullName}>
+            <input type="text" value={values.fullName} onChange={(e) => set("fullName", e.target.value)}
+              autoComplete="off" placeholder="e.g. Rohan Mehta" />
+          </Field>
+          <Field label="WhatsApp *" error={errors.whatsapp}>
+            <input type="tel" inputMode="numeric" value={values.whatsapp} onChange={(e) => set("whatsapp", e.target.value)}
+              autoComplete="off" placeholder="e.g. 98765 43210" />
+          </Field>
+          <Field label="Email" error={errors.email} hint="Optional — for brochures & shortlists.">
+            <input type="email" value={values.email} onChange={(e) => set("email", e.target.value)}
+              autoComplete="off" placeholder="e.g. rohan@email.com" />
+          </Field>
+          <Field label="Found us via">
+            <AdminSelect value={values.foundVia} onChange={(v) => set("foundVia", v)}
+              options={sourceOptions} placeholder="Select (optional)" ariaLabel="How did they find us" />
+          </Field>
+        </div>
+      </section>
+
+      {/* ---- Requirement: mirrors the public enquiry form ---- */}
+      <section className="admin-form__section">
+        <h2 className="admin-form__legend">Requirement</h2>
+        <div className="admin-grid">
+          <FieldBlock label="Looking for *" error={errors.segment} wide>
+            <div className={`admin-segmented${errors.segment ? " is-invalid" : ""}`} role="radiogroup" aria-label="Segment">
+              {segmentOptions.map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  role="radio"
+                  aria-checked={values.segment === opt}
+                  className={`admin-segmented__opt${values.segment === opt ? " active" : ""}`}
+                  onClick={() => setSegment(opt)}
+                >
+                  <i className={`fa-solid ${opt === "Commercial" ? "fa-building" : "fa-house-chimney"}`} aria-hidden="true" />
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </FieldBlock>
+
+          <Field label="Requirement *" error={errors.requirement}>
             <AdminSelect value={values.requirement} onChange={setRequirement}
               options={requirementOptions} placeholder="Select requirement" ariaLabel="Requirement type" />
           </Field>
-          <Field label="Property category *" error={errors.propertyCategory}>
+          <Field label="Category *" error={errors.propertyCategory}>
             <AdminSelect value={values.propertyCategory} onChange={setPropertyCategory}
               options={categoryOptionsFor(values)} placeholder="Select category" ariaLabel="Property category" />
           </Field>
@@ -255,9 +291,9 @@ export default function EnquiryForm({ properties = [], saving, onSubmit, onCance
                 options={configurationOptions} placeholder="Select configuration" ariaLabel="Configuration" />
             </Field>
           )}
-          <Field label="Budget range *" error={errors.budget}>
+          <Field label="Budget *" error={errors.budget}>
             <AdminSelect value={values.budget} onChange={(v) => set("budget", v)}
-              options={budgetOptionsFor(values)} placeholder="Select budget range" ariaLabel="Budget range" />
+              options={budgetOptionsFor(values)} placeholder="Select budget" ariaLabel="Budget range" />
           </Field>
           {showPurpose(values) && (
             <Field label="Purpose *" error={errors.purpose}>
@@ -265,56 +301,26 @@ export default function EnquiryForm({ properties = [], saving, onSubmit, onCance
                 options={purposeOptions} placeholder="Select purpose" ariaLabel="Purpose" />
             </Field>
           )}
-          <Field label="Timeline to move / close *" error={errors.timeline}>
+          <Field label="Timeline *" error={errors.timeline}>
             <AdminSelect value={values.timeline} onChange={(v) => set("timeline", v)}
               options={timelineOptions} placeholder="Select timeline" ariaLabel="Timeline" />
           </Field>
           {showFurnishing(values) && (
-            <Field label="Furnishing preference *" error={errors.furnishing}>
+            <Field label="Furnishing *" error={errors.furnishing}>
               <AdminSelect value={values.furnishing} onChange={(v) => set("furnishing", v)}
                 options={furnishingOptions} placeholder="Select furnishing" ariaLabel="Furnishing" />
             </Field>
           )}
-        </div>
 
-        <label className={`admin-field admin-field--wide${errors.locations ? " admin-field--invalid" : ""}`} style={{ marginTop: 14 }}>
-          <span>Preferred location(s) *</span>
-          <LocationMultiSelect selected={locations} invalid={!!errors.locations} onChange={setLocationsAndClear} />
-          {errors.locations
-            ? <small className="admin-field__err">{errors.locations}</small>
-            : <small className="admin-field__hint-sm">Select one or more preferred areas.</small>}
-        </label>
-      </div>
-
-      {/* ---- Contact ---- */}
-      <div className="admin-form__section">
-        <h2 className="admin-form__legend">Contact</h2>
-        <div className="admin-grid">
-          <Field label="Full name *" error={errors.fullName}>
-            <input type="text" value={values.fullName} onChange={(e) => set("fullName", e.target.value)}
-              autoComplete="off" placeholder="e.g. Rohan Mehta" />
-          </Field>
-          <Field label="WhatsApp number *" error={errors.whatsapp}>
-            <input type="tel" inputMode="numeric" value={values.whatsapp} onChange={(e) => set("whatsapp", e.target.value)}
-              autoComplete="off" placeholder="e.g. 98765 43210" />
-          </Field>
-          <Field label="Email" error={errors.email} hint="Optional — for brochures & shortlists.">
-            <input type="email" value={values.email} onChange={(e) => set("email", e.target.value)}
-              autoComplete="off" placeholder="e.g. rohan@email.com" />
-          </Field>
-          <Field label="How did they find us?">
-            <AdminSelect value={values.foundVia} onChange={(v) => set("foundVia", v)}
-              options={sourceOptions} placeholder="Select an option (optional)" ariaLabel="How did they find us" />
-          </Field>
-          <Field label="Additional details" wide>
-            <textarea rows="3" value={values.details} onChange={(e) => set("details", e.target.value)}
-              placeholder="Specific society, amenities, urgency, notes from the call…" />
-          </Field>
+          <FieldBlock label="Preferred location(s) *" error={errors.locations} wide
+            hint="Select one or more preferred areas.">
+            <LocationMultiSelect selected={locations} invalid={!!errors.locations} onChange={setLocationsAndClear} />
+          </FieldBlock>
         </div>
-      </div>
+      </section>
 
       {/* ---- Admin context ---- */}
-      <div className="admin-form__section">
+      <section className="admin-form__section">
         <h2 className="admin-form__legend">Lead management</h2>
         <div className="admin-grid">
           <Field label="Received via *" hint="How this lead reached you.">
@@ -332,8 +338,12 @@ export default function EnquiryForm({ properties = [], saving, onSubmit, onCance
             <AdminSelect value={values.status} onChange={(v) => set("status", v)}
               options={STATUS_OPTIONS} ariaLabel="Status" />
           </Field>
+          <Field label="Notes" wide>
+            <textarea rows="3" value={values.details} onChange={(e) => set("details", e.target.value)}
+              placeholder="Specific society, amenities, urgency, notes from the call…" />
+          </Field>
         </div>
-      </div>
+      </section>
 
       <div className="admin-form__actions">
         <button type="button" className="admin-btn" onClick={onCancel} disabled={saving}>Cancel</button>
