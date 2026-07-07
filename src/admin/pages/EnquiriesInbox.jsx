@@ -1,14 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { getEnquiries, markEnquiryHandled } from "../../firebase/firestore";
+import { timeAgo, formatDateTime, initials, avatarGradient } from "../format";
 
 const STATUSES = ["new", "contacted", "closed"];
-
-// Firestore Timestamp | Date | undefined → readable string.
-function formatDate(ts) {
-  const d = ts?.toDate ? ts.toDate() : ts instanceof Date ? ts : null;
-  if (!d) return "";
-  return d.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
-}
+const FILTERS = ["all", ...STATUSES];
 
 export default function EnquiriesInbox() {
   const [items, setItems] = useState(null);
@@ -52,7 +47,7 @@ export default function EnquiriesInbox() {
       </div>
 
       <div className="admin-filters">
-        {["all", ...STATUSES].map((s) => (
+        {FILTERS.map((s) => (
           <button
             key={s}
             className={`admin-chip${filter === s ? " is-active" : ""}`}
@@ -65,46 +60,61 @@ export default function EnquiriesInbox() {
 
       {error && <p className="admin-error">{error}</p>}
       {!items && !error && <p className="admin-muted">Loading…</p>}
-      {items && visible.length === 0 && <p className="admin-muted">No enquiries here.</p>}
+      {items && visible.length === 0 && (
+        <div className="admin-empty">
+          <i className="fa-solid fa-inbox" aria-hidden="true" />
+          <p>{filter === "all" ? "No enquiries yet." : `No ${filter} enquiries.`}</p>
+        </div>
+      )}
 
-      <div className="admin-cards">
-        {visible.map((e) => (
-          <article key={e.id} className="admin-card">
-            <header className="admin-card__head">
-              <div>
-                <strong>{e.name || "—"}</strong>
-                <span className="admin-muted"> · {formatDate(e.createdAt)}</span>
+      <div className="admin-enq-list">
+        {visible.map((e) => {
+          const status = e.status || "new";
+          return (
+            <article key={e.id} className={`admin-enq admin-enq--${status}`}>
+              <span className="admin-avatar" style={{ background: avatarGradient(e.name || e.email) }}>
+                {initials(e.name)}
+              </span>
+
+              <div className="admin-enq__body">
+                <header className="admin-enq__head">
+                  <span className="admin-enq__name">
+                    {status === "new" && <span className="admin-enq__unread" title="Unread" />}
+                    {e.name || "Unknown"}
+                  </span>
+                  <span className={`admin-badge admin-badge--${status}`}>{status}</span>
+                  <time className="admin-enq__time" title={formatDateTime(e.createdAt)}>{timeAgo(e.createdAt)}</time>
+                </header>
+
+                <div className="admin-enq__contact">
+                  {e.phone && <a href={`tel:${e.phone}`}><i className="fa-solid fa-phone" aria-hidden="true" /> {e.phone}</a>}
+                  {e.email && <a href={`mailto:${e.email}`}><i className="fa-solid fa-envelope" aria-hidden="true" /> {e.email}</a>}
+                  {e.propertyId && (
+                    <a href={`/property/${e.propertyId}`} target="_blank" rel="noopener noreferrer">
+                      <i className="fa-solid fa-building" aria-hidden="true" /> {e.propertyId}
+                    </a>
+                  )}
+                  {e.source && <span className="admin-muted">via {e.source}</span>}
+                </div>
+
+                {e.message && <p className="admin-enq__msg admin-prewrap">{e.message}</p>}
+
+                <footer className="admin-enq__actions">
+                  {STATUSES.map((s) => (
+                    <button
+                      key={s}
+                      className={`admin-btn admin-btn--sm${e.status === s ? " admin-btn--primary" : ""}`}
+                      onClick={() => setStatus(e, s)}
+                      disabled={e.status === s}
+                    >
+                      {s === "new" ? "Mark new" : s === "contacted" ? "Contacted" : "Close"}
+                    </button>
+                  ))}
+                </footer>
               </div>
-              <span className={`admin-badge admin-badge--${e.status}`}>{e.status}</span>
-            </header>
-
-            <div className="admin-card__contact">
-              {e.phone && <a href={`tel:${e.phone}`}><i className="fa-solid fa-phone" aria-hidden="true" /> {e.phone}</a>}
-              {e.email && <a href={`mailto:${e.email}`}><i className="fa-solid fa-envelope" aria-hidden="true" /> {e.email}</a>}
-              {e.propertyId && (
-                <a href={`/property/${e.propertyId}`} target="_blank" rel="noopener noreferrer">
-                  <i className="fa-solid fa-building" aria-hidden="true" /> {e.propertyId}
-                </a>
-              )}
-              {e.source && <span className="admin-muted">via {e.source}</span>}
-            </div>
-
-            {e.message && <p className="admin-card__quote admin-prewrap">{e.message}</p>}
-
-            <footer className="admin-row-actions">
-              {STATUSES.map((s) => (
-                <button
-                  key={s}
-                  className={`admin-btn admin-btn--sm${e.status === s ? " admin-btn--primary" : ""}`}
-                  onClick={() => setStatus(e, s)}
-                  disabled={e.status === s}
-                >
-                  {s}
-                </button>
-              ))}
-            </footer>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
     </div>
   );

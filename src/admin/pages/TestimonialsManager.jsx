@@ -6,6 +6,18 @@ import {
   deleteTestimonial,
 } from "../../firebase/firestore";
 import TestimonialForm from "../components/TestimonialForm";
+import { initials, avatarGradient } from "../format";
+
+function Stars({ rating }) {
+  const r = Math.max(1, Math.min(5, Math.round(rating ?? 5)));
+  return (
+    <span className="admin-stars" aria-label={`${r} out of 5`}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <i key={n} className={`fa-${n <= r ? "solid" : "regular"} fa-star`} aria-hidden="true" />
+      ))}
+    </span>
+  );
+}
 
 export default function TestimonialsManager() {
   const [items, setItems] = useState(null);
@@ -79,19 +91,27 @@ export default function TestimonialsManager() {
       {items && items.length > 0 && (
         <div className="admin-cards">
           {items.map((t) => (
-            <article key={t.id} className="admin-card">
-              <header className="admin-card__head">
-                <div>
-                  <strong>{t.name}</strong>
-                  {t.role && <span className="admin-muted"> · {t.role}</span>}
+            <article key={t.id} className={`admin-tcard${t.featured ? " is-featured" : ""}`}>
+              {t.featured && (
+                <span className="admin-tcard__ribbon"><i className="fa-solid fa-star" aria-hidden="true" /> Featured</span>
+              )}
+              <i className="fa-solid fa-quote-right admin-tcard__mark" aria-hidden="true" />
+              <p className="admin-tcard__quote">{t.quote}</p>
+              <div className="admin-tcard__foot">
+                <span className="admin-avatar" style={{ background: avatarGradient(t.name) }}>{initials(t.name)}</span>
+                <div className="admin-tcard__who">
+                  <span className="admin-tcard__name">{t.name}</span>
+                  {t.role && <span className="admin-tcard__role">{t.role}</span>}
+                  <Stars rating={t.rating} />
                 </div>
-                <span className="admin-stars">{"★".repeat(Math.max(1, Math.min(5, Math.round(t.rating ?? 5))))}</span>
-              </header>
-              <p className="admin-card__quote">“{t.quote}”</p>
-              <footer className="admin-row-actions">
-                {t.featured && <span className="admin-badge admin-badge--active">Featured</span>}
-                <button className="admin-btn admin-btn--sm" onClick={() => setEditing(t)}>Edit</button>
-                <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => handleDelete(t)}>Delete</button>
+              </div>
+              <footer className="admin-tcard__actions">
+                <button className="admin-btn admin-btn--sm" onClick={() => setEditing(t)}>
+                  <i className="fa-solid fa-pen" aria-hidden="true" /> Edit
+                </button>
+                <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => handleDelete(t)}>
+                  <i className="fa-solid fa-trash" aria-hidden="true" /> Delete
+                </button>
               </footer>
             </article>
           ))}

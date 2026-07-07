@@ -2,6 +2,32 @@ import { useEffect, useState } from "react";
 import { getFaqs, addFaq, updateFaq, deleteFaq } from "../../firebase/firestore";
 import FaqForm from "../components/FaqForm";
 
+function FaqRow({ faq, index, onEdit, onDelete }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`admin-faq${open ? " is-open" : ""}`}>
+      <button className="admin-faq__q" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <span className="admin-faq__num">{String(index + 1).padStart(2, "0")}</span>
+        <span className="admin-faq__question">{faq.question}</span>
+        <i className="fa-solid fa-chevron-down admin-faq__chev" aria-hidden="true" />
+      </button>
+      {open && (
+        <div className="admin-faq__body">
+          <p className="admin-faq__answer">{faq.answer}</p>
+          <div className="admin-row-actions">
+            <button className="admin-btn admin-btn--sm" onClick={() => onEdit(faq)}>
+              <i className="fa-solid fa-pen" aria-hidden="true" /> Edit
+            </button>
+            <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => onDelete(faq)}>
+              <i className="fa-solid fa-trash" aria-hidden="true" /> Delete
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function FaqsManager() {
   const [items, setItems] = useState(null);
   const [error, setError] = useState("");
@@ -75,16 +101,9 @@ export default function FaqsManager() {
       {items && items.length === 0 && <p className="admin-muted">No FAQs yet.</p>}
 
       {items && items.length > 0 && (
-        <div className="admin-cards">
-          {items.map((f) => (
-            <article key={f.id} className="admin-card">
-              <strong>{f.question}</strong>
-              <p className="admin-card__quote">{f.answer}</p>
-              <footer className="admin-row-actions">
-                <button className="admin-btn admin-btn--sm" onClick={() => setEditing(f)}>Edit</button>
-                <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => handleDelete(f)}>Delete</button>
-              </footer>
-            </article>
+        <div className="admin-faqs">
+          {items.map((f, i) => (
+            <FaqRow key={f.id} faq={f} index={i} onEdit={setEditing} onDelete={handleDelete} />
           ))}
         </div>
       )}
