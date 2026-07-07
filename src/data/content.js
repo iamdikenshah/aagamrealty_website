@@ -74,8 +74,8 @@ export const navLinks = [
   { href: "#home", label: "Home" },
   { href: "#services", label: "Services" },
   { href: "#featured", label: "Properties" },
-  { href: "#testimonials", label: "Testimonials" },
   { href: "#about", label: "About" },
+  { href: "#testimonials", label: "Testimonials" },
 ];
 
 // Locality quick-links for the footer (SEO). Each deep-links into the listing

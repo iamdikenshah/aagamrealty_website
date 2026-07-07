@@ -27,6 +27,8 @@ function Home() {
   return (
     <main>
       <Hero />
+      {/* Trust band directly under the hero — credibility before we ask you to browse. */}
+      <Stats />
       <Services />
       <PropertyShowcase
         id="featured"
@@ -46,10 +48,10 @@ function Home() {
         viewAllTo="/properties?category=commercial"
         viewAllLabel="View all commercial"
       />
-      <Stats />
+      {/* Trust cluster: who we are → client voices → objection-handling FAQ (last before footer). */}
+      <About />
       <Testimonials />
       <FaqSection />
-      <About />
     </main>
   );
 }
