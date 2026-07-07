@@ -1,9 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { locationOptions } from "../data/content";
+import { isConfigured } from "../firebase/config";
 
 export default function LocationMultiSelect({ selected, onChange, invalid }) {
   const [open, setOpen] = useState(false);
+  // Localities are CMS-managed; seed with the bundled list so the control renders
+  // instantly, then swap in the managed list (loaded on demand, post-paint).
+  const [options, setOptions] = useState(locationOptions);
   const groupRef = useRef(null);
+
+  useEffect(() => {
+    if (!isConfigured) return;
+    let active = true;
+    import("../firebase/firestore")
+      .then(({ getNames }) => getNames("localities"))
+      .then((names) => { if (active && names.length) setOptions(names); })
+      .catch(() => { /* keep the bundled fallback */ });
+    return () => { active = false; };
+  }, []);
 
   // Close when clicking outside the group.
   useEffect(() => {
@@ -66,7 +80,7 @@ export default function LocationMultiSelect({ selected, onChange, invalid }) {
       </button>
 
       <div className="multiselect-panel" role="listbox" aria-multiselectable="true">
-        {locationOptions.map((option) => (
+        {options.map((option) => (
           <label className="ms-option" key={option}>
             <input
               type="checkbox"

@@ -85,6 +85,20 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
     setFailed(false);
     try {
       await fetch(GOOGLE_FORM.action, { method: "POST", mode: "no-cors", body: data });
+      // Best-effort mirror to Firestore for the admin inbox — tagged with the
+      // listing this enquiry is about. Never blocks/fails the user's submission.
+      // Loaded on demand so the Firestore SDK stays off the critical bundle.
+      import("../../firebase/firestore")
+        .then(({ addEnquiry }) =>
+          addEnquiry({
+            name: values.name.trim(),
+            phone: values.phone.trim(),
+            email: values.email.trim(),
+            message: values.message.trim(),
+            propertyId: property.id,
+          })
+        )
+        .catch((err) => console.error("[enquiry] Firestore mirror failed", err));
       track("enquiry_submitted", {
         source: "property_form",
         property_id: property.id,

@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// =============================================================================
+// FIREBASE STORAGE SECURITY RULES — Aagam Realty CMS
+// =============================================================================
+// Mirrors firestore.rules: property/testimonial images are publicly readable
+// (they're served on the public site) and admin-only to write. Admin is the
+// same custom claim (admin == true) used by firestore.rules.
+// =============================================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    match /properties/{propertyId}/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /testimonials/{testimonialId}/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Everything else is closed by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

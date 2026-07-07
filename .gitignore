@@ -9,6 +9,12 @@ dist-ssr
 .env.*
 !.env.example
 
+# Firebase Admin SDK service-account key (used by scripts/migrate-*). NEVER commit.
+*serviceAccount*.json
+*service-account*.json
+*firebase-adminsdk*.json
+serviceAccountKey.json
+
 # Logs
 logs
 *.log

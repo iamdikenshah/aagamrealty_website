@@ -17,6 +17,27 @@ import {
 } from "../data/content";
 import { track } from "../analytics";
 
+// Compress the structured selections + free text into a single readable message
+// so the Firestore-backed admin inbox has the full context of the lead (the
+// Google Form keeps each field in its own sheet column separately).
+function buildEnquiryMessage(values, locations) {
+  return [
+    [values.segment, values.requirement].filter(Boolean).join(" ") &&
+      `Requirement: ${[values.segment, values.requirement].filter(Boolean).join(" ")}`,
+    values.propertyCategory && `Category: ${values.propertyCategory}`,
+    values.configuration && `Configuration: ${values.configuration}`,
+    values.budget && `Budget: ${values.budget}`,
+    locations.length && `Locations: ${locations.join(", ")}`,
+    values.timeline && `Timeline: ${values.timeline}`,
+    values.furnishing && `Furnishing: ${values.furnishing}`,
+    values.purpose && `Purpose: ${values.purpose}`,
+    values.source && `Found us via: ${values.source}`,
+    values.details.trim() && `Details: ${values.details.trim()}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
 const EMPTY_FORM = {
   segment: "",
   fullName: "",
@@ -271,6 +292,20 @@ export default function EnquiryForm() {
     try {
       // no-cors: submission succeeds; the response is opaque.
       await fetch(GOOGLE_FORM.action, { method: "POST", mode: "no-cors", body: data });
+      // Best-effort mirror to Firestore for the admin inbox — never block or fail
+      // the user's submission on this (the Google Form sheet is the safety net).
+      // Loaded on demand so the Firestore SDK stays off the critical bundle.
+      import("../firebase/firestore")
+        .then(({ addEnquiry }) =>
+          addEnquiry({
+            name: values.fullName.trim(),
+            phone: values.whatsapp.trim(),
+            email: values.email.trim(),
+            message: buildEnquiryMessage(values, locations),
+            propertyId: null,
+          })
+        )
+        .catch((err) => console.error("[enquiry] Firestore mirror failed", err));
       track("enquiry_submitted", {
         source: "main_form",
         segment: values.segment || undefined,

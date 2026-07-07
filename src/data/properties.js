@@ -1,15 +1,20 @@
 // =============================================================================
 // PROPERTY DATA ACCESS LAYER
 // =============================================================================
-// This is the ONLY module that touches the raw listing data. The raw records
-// live in ./properties.json (one flat array); the listing and detail pages call
-// getProperties()/getPropertyById() and never import that JSON directly. When the
-// WordPress CMS is ready, replace the bodies of those two functions with a
-// fetch() to the REST/GraphQL endpoint (mapping the response into the same shape
-// as the JSON) — nothing else in the app needs to change.
+// This is the ONLY module that touches the raw listing data. The listing and
+// detail pages call getProperties()/getPropertyById() and never import the data
+// source directly. Listings now live in the `properties` Firestore collection
+// (see ../firebase/firestore.js); this module fetches the raw documents and
+// applies the same filtering it always has, so the return shape is byte-for-byte
+// what the pages already expect — no changes needed anywhere downstream.
 //
-// Both getters are async on purpose so the CMS swap is a drop-in: the pages
-// already handle loading state and await the result.
+// The bundled ./properties.json is kept as a fallback: it seeds the migration
+// script, and it keeps the site working when Firebase isn't configured for the
+// build (e.g. local dev without .env.local) or a Firestore read transiently
+// fails. Once migrated, Firestore is the source of truth.
+//
+// Both getters are async so the pages already handle loading state and await the
+// result.
 //
 // Taxonomy (mirrors how listings are organised on the site):
 //   category    — "residential" | "commercial"        (top-level split)
@@ -18,6 +23,12 @@
 // =============================================================================
 
 import PROPERTIES from "./properties.json";
+import { isConfigured } from "../firebase/config";
+
+// The Firestore SDK is loaded on demand (only when a getter actually runs) so it
+// never lands on the public site's critical bundle — the pages already await
+// these getters and show a loading state, so the extra async import is free.
+const firestore = () => import("../firebase/firestore");
 
 /**
  * @typedef {"residential" | "commercial"} Category
@@ -25,8 +36,21 @@ import PROPERTIES from "./properties.json";
  * @typedef {"rental" | "owned" | "pre-lease" | "land"} ListingType
  */
 
-// --- Small helper: simulate async so the CMS swap is a drop-in ---------------
+// --- Small helper: simulate async so the fallback path stays a drop-in -------
 const asAsync = (value) => Promise.resolve(value);
+
+// Load every listing from Firestore, falling back to the bundled JSON when
+// Firebase isn't configured or the read fails, so the site is never left blank.
+async function loadAll() {
+  if (!isConfigured) return PROPERTIES;
+  try {
+    const { fetchProperties } = await firestore();
+    return await fetchProperties();
+  } catch (err) {
+    console.error("[properties] Firestore read failed — using bundled data.", err);
+    return PROPERTIES;
+  }
+}
 
 // -----------------------------------------------------------------------------
 // PUBLIC API — the only functions the rest of the app should call.
@@ -55,7 +79,8 @@ export async function getProperties(filters = {}) {
     budgetMin, budgetMax, featured,
   } = filters;
 
-  const results = PROPERTIES.filter((p) => {
+  const source = await loadAll();
+  const results = source.filter((p) => {
     if (categories?.length && !categories.includes(p.category)) return false;
     if (transactions?.length && !transactions.includes(p.transaction)) return false;
     if (listingTypes?.length && !listingTypes.includes(p.listingType)) return false;
@@ -92,6 +117,14 @@ export async function getProperties(filters = {}) {
  * @returns {Promise<object|null>}
  */
 export async function getPropertyById(id) {
+  if (isConfigured) {
+    try {
+      const { fetchPropertyById } = await firestore();
+      return await fetchPropertyById(id);
+    } catch (err) {
+      console.error("[properties] Firestore read failed — using bundled data.", err);
+    }
+  }
   return asAsync(PROPERTIES.find((p) => p.id === id) ?? null);
 }
 
@@ -101,11 +134,12 @@ export async function getPropertyById(id) {
  * @returns {Promise<{listingTypes:string[], localities:string[], stages:string[], configs:string[]}>}
  */
 export async function getFilterFacets() {
-  const localities = [...new Set(PROPERTIES.map((p) => p.locality))].sort();
-  const stages = [...new Set(PROPERTIES.map((p) => p.projectStage).filter(Boolean))];
+  const source = await loadAll();
+  const localities = [...new Set(source.map((p) => p.locality))].sort();
+  const stages = [...new Set(source.map((p) => p.projectStage).filter(Boolean))];
   const configs = [
     ...new Set(
-      PROPERTIES.flatMap((p) => p.configurations?.map((c) => c.config) ?? [])
+      source.flatMap((p) => p.configurations?.map((c) => c.config) ?? [])
     ),
   ];
   return asAsync({

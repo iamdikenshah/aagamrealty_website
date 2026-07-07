@@ -1,0 +1,67 @@
+rules_version = '2';
+
+// =============================================================================
+// FIRESTORE SECURITY RULES — Aagam Realty CMS
+// =============================================================================
+// Public visitors can read published content and create enquiries; only the
+// single admin account can write listings/testimonials or read/manage enquiries.
+//
+// Admin is identified by a custom auth claim: admin == true. Set it once on the
+// one admin account (Admin SDK):
+//   await admin.auth().setCustomUserClaims(uid, { admin: true });
+// then have that user sign out/in so the new token carries the claim.
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    // Listings: public may read anything except drafts; only admin writes.
+    // NOTE: because rules apply to list queries as a whole, the public client
+    // must query with where("status","!=","draft") (see firebase/firestore.js) —
+    // an unconstrained public list is rejected here by design.
+    match /properties/{propertyId} {
+      allow read: if isAdmin() || resource.data.status != 'draft';
+      allow write: if isAdmin();
+    }
+
+    // Testimonials: fully public to read, admin-only to write.
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // CMS-managed reference lists (dropdown sources). Public read so the site can
+    // populate localities etc.; admin-only write. `developers` is admin-facing but
+    // public read is harmless (just names).
+    match /developers/{id}   { allow read: if true; allow write: if isAdmin(); }
+    match /localities/{id}   { allow read: if true; allow write: if isAdmin(); }
+    match /amenities/{id}    { allow read: if true; allow write: if isAdmin(); }
+    match /keyFeatures/{id}  { allow read: if true; allow write: if isAdmin(); }
+
+    // FAQs: fully public to read, admin-only to write.
+    match /faqs/{id}         { allow read: if true; allow write: if isAdmin(); }
+
+    // Enquiries: the public site may CREATE only (no read/update/delete); the
+    // admin has full access. The create rule pins the incoming shape so the
+    // endpoint can't be abused to write arbitrary documents.
+    match /enquiries/{enquiryId} {
+      allow create: if request.resource.data.status == 'new'
+                    && request.resource.data.source is string
+                    && request.resource.data.name is string
+                    && request.resource.data.phone is string
+                    && request.resource.data.keys().hasOnly(
+                         ['name', 'phone', 'email', 'message', 'propertyId', 'source', 'status', 'createdAt']
+                       );
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Everything else is closed by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

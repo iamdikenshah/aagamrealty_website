@@ -29,7 +29,18 @@ export default function HeroSearch() {
   const [localities, setLocalities] = useState([]);
 
   useEffect(() => {
-    getFilterFacets().then((f) => setLocalities(f.localities));
+    let active = true;
+    // Prefer the CMS-managed locality list; fall back to localities derived from
+    // the current listings if it's empty/unavailable.
+    import("../firebase/firestore")
+      .then(({ getNames }) => getNames("localities"))
+      .then((names) => {
+        if (!active) return;
+        if (names.length) setLocalities(names);
+        else getFilterFacets().then((f) => active && setLocalities(f.localities));
+      })
+      .catch(() => getFilterFacets().then((f) => active && setLocalities(f.localities)));
+    return () => { active = false; };
   }, []);
 
   // Budget bands differ by transaction (monthly vs sale) — reset on switch so a

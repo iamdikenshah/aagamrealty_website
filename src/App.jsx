@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Services from "./components/Services";
 import Stats from "./components/Stats";
 import Testimonials from "./components/Testimonials";
+import FaqSection from "./components/FaqSection";
 import About from "./components/About";
 import EnquiryModal from "./components/EnquiryModal";
 import Footer from "./components/Footer";
@@ -14,6 +15,11 @@ import PropertyDetail from "./pages/PropertyDetail";
 import { useLocation, navigate } from "./router.jsx";
 import { openEnquiry } from "./enquiryStore";
 import { trackPageView } from "./analytics";
+
+// The entire admin CMS is code-split: this dynamic import is the only reference
+// to it, so none of the admin bundle (or its react-router / firebase-auth /
+// firebase-storage deps) is downloaded until someone actually visits /admin.
+const AdminApp = lazy(() => import("./admin/AdminApp"));
 
 // The original single-page marketing site (anchored sections).
 function Home() {
@@ -41,6 +47,7 @@ function Home() {
       />
       <Stats />
       <Testimonials />
+      <FaqSection />
       <About />
     </main>
   );
@@ -79,6 +86,8 @@ function Router() {
 }
 
 export default function App() {
+  const path = useLocation();
+
   // Smooth-scroll any in-page anchor (#section) but keep the URL clean —
   // scroll to the target and strip the hash instead of letting it appear.
   // Only relevant on the home page, where these section targets exist.
@@ -113,6 +122,24 @@ export default function App() {
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
   }, []);
+
+  // The admin CMS is its own self-contained surface — render it without the
+  // public site chrome (navbar/footer/enquiry modal) and behind Suspense so its
+  // code-split chunk loads on demand. 404.html already preserves deep links like
+  // /admin/properties, so a direct hit lands here after the SPA restore.
+  if (path.startsWith("/admin")) {
+    return (
+      <Suspense
+        fallback={
+          <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", color: "#555" }}>
+            Loading…
+          </div>
+        }
+      >
+        <AdminApp />
+      </Suspense>
+    );
+  }
 
   return (
     <>

@@ -35,6 +35,7 @@ export default function PropertyDetail({ id }) {
   const [property, setProperty] = useState(undefined); // undefined = loading, null = not found
   const [activeConfig, setActiveConfig] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null); // null = closed, number = open at index
+  const [cmsFaqs, setCmsFaqs] = useState([]); // CMS-managed FAQs (fall back to the static list)
 
   useEffect(() => {
     let active = true;
@@ -49,6 +50,18 @@ export default function PropertyDetail({ id }) {
       active = false;
     };
   }, [id]);
+
+  // Load CMS FAQs on demand (keeps Firestore off this page's critical bundle).
+  useEffect(() => {
+    let active = true;
+    import("../firebase/firestore")
+      .then(({ fetchFaqs }) => fetchFaqs())
+      .then((list) => { if (active) setCmsFaqs(list); })
+      .catch(() => { /* keep the static fallback */ });
+    return () => { active = false; };
+  }, []);
+
+  const faqItems = cmsFaqs.length ? cmsFaqs.map((f) => ({ q: f.question, a: f.answer })) : FAQS;
 
   if (property === undefined) {
     return (
@@ -307,7 +320,7 @@ export default function PropertyDetail({ id }) {
 
             {/* 15. FAQ accordion */}
             <Section id="faq" title="Frequently Asked Questions">
-              <Faq items={FAQS} />
+              <Faq items={faqItems} />
             </Section>
           </div>
 

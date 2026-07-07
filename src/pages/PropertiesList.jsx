@@ -65,9 +65,17 @@ export default function PropertiesList() {
   const [loading, setLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Load filter options once.
+  // Load filter options once. Localities come from the CMS-managed list (so the
+  // filter matches what's offered elsewhere); everything else is derived from the
+  // current listings. Falls back to derived localities if the managed list is empty.
   useEffect(() => {
-    getFilterFacets().then(setFacets);
+    getFilterFacets().then((f) => {
+      setFacets(f);
+      import("../firebase/firestore")
+        .then(({ getNames }) => getNames("localities"))
+        .then((names) => { if (names.length) setFacets((prev) => ({ ...prev, localities: names })); })
+        .catch(() => { /* keep derived localities */ });
+    });
   }, []);
 
   // Re-query whenever filters change (client-side against the data module).

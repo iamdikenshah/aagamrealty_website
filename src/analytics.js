@@ -18,15 +18,11 @@
 //   track("whatsapp_click", { location: "float" });
 // =============================================================================
 
-const config = {
-  apiKey: import.meta.env.VITE_FB_API_KEY,
-  authDomain: import.meta.env.VITE_FB_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FB_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FB_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FB_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FB_APP_ID,
-  measurementId: import.meta.env.VITE_FB_MEASUREMENT_ID,
-};
+// The app itself is created (once) in ./firebase/config.js so analytics and the
+// Firestore/Auth/Storage layers all share a single Firebase app instance. The
+// analytics SDK is still loaded via dynamic import() so it stays out of the
+// critical bundle and off the first-paint path.
+import { app, firebaseConfig as config } from "./firebase/config";
 
 let analytics = null;
 let logEventFn = null;
@@ -52,13 +48,11 @@ async function init() {
     }
     return;
   }
+  // apiKey/projectId missing → the shared app wasn't created; stay a no-op.
+  if (!app) return;
   try {
-    const [{ initializeApp }, { getAnalytics, isSupported, logEvent }] = await Promise.all([
-      import("firebase/app"),
-      import("firebase/analytics"),
-    ]);
+    const { getAnalytics, isSupported, logEvent } = await import("firebase/analytics");
     if (!(await isSupported())) return;
-    const app = initializeApp(config);
     analytics = getAnalytics(app);
     logEventFn = logEvent;
     // Flush anything queued while the SDK was loading.

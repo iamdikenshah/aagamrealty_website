@@ -777,6 +777,10 @@ section { padding: 72px 0; }
 .stars { color: var(--gold-2); font-size: 14px; letter-spacing: 2px; }
 
 /* ===================== ABOUT ===================== */
+/* ===================== FAQ ===================== */
+.faq-section { background: var(--white); }
+.faq-section__list { max-width: 800px; margin: 40px auto 0; }
+
 .about { background: var(--white); }
 .about-grid {
   display: grid;
