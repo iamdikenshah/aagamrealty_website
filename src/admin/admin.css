@@ -317,7 +317,13 @@
 }
 .admin-form .multiselect-caret { font-size: 11px; color: var(--gray); }
 .admin-form .multiselect-panel { border-width: 1px; border-color: #e4e9f2; }
-.admin-form .ms-option { min-height: 38px; font-size: 0.9rem; }
+.admin-form .ms-option { min-height: 38px; font-size: 0.9rem; justify-content: flex-start; }
+/* Stop the generic `.admin-field input` rule (full width + padding + border)
+   from bleeding onto the multiselect's checkboxes and shoving labels aside. */
+.admin-form .ms-option input[type="checkbox"] {
+  width: 17px; height: 17px; min-width: 17px; flex: 0 0 auto;
+  padding: 0; border: 0; border-radius: 4px; accent-color: var(--purple);
+}
 
 .admin-subrow { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; padding: 12px 0; border-bottom: 1px solid var(--light-gray); }
 .admin-subfield { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; flex: 1 1 110px; }
