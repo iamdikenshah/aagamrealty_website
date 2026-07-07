@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, navigate } from "../router.jsx";
 import PropertyEnquiryForm from "../components/property/PropertyEnquiryForm";
 import PropertyLightbox from "../components/property/PropertyLightbox";
+import SmartImage from "../components/SmartImage.jsx";
 import { track } from "../analytics";
 import {
   getPropertyById,
@@ -368,9 +369,10 @@ function Gallery({ images = [], title, onOpen }) {
   return (
     <div className="prop-hero">
       <div className={`prop-hero__main${onOpen ? " prop-hero__main--zoom" : ""}`}>
-        <img
+        <SmartImage
           src={images[active]}
           alt={`${title} — image ${active + 1}`}
+          eager
           onClick={onOpen ? () => onOpen(active) : undefined}
           role={onOpen ? "button" : undefined}
         />
@@ -397,7 +399,7 @@ function Gallery({ images = [], title, onOpen }) {
           {images.map((src, i) => (
             <button key={src} className={`prop-hero__thumb${i === active ? " active" : ""}`}
               onClick={() => setActive(i)} aria-label={`View image ${i + 1}`}>
-              <img src={src} alt="" loading="lazy" />
+              <SmartImage src={src} alt="" />
             </button>
           ))}
         </div>
@@ -435,7 +437,7 @@ function CategoryGallery({ gallery, onOpen }) {
             onClick={() => onOpen?.(g.index)}
             aria-label={`View ${g.caption || g.category}`}
           >
-            <img src={g.url} alt={g.caption || g.category} loading="lazy" />
+            <SmartImage src={g.url} alt={g.caption || g.category} />
             <span className="prop-gallery__zoom" aria-hidden="true"><i className="fa-solid fa-magnifying-glass-plus" /></span>
             <span className="prop-gallery__cap">{g.caption || g.category}</span>
           </button>

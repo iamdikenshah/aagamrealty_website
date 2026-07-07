@@ -1,5 +1,6 @@
 import { Link } from "../../router.jsx";
 import { track } from "../../analytics";
+import SmartImage from "../SmartImage.jsx";
 import {
   LISTING_TYPE_LABELS,
   formatPriceRange,
@@ -34,7 +35,7 @@ export default function PropertyCard({ property, source = "listing" }) {
     >
       <div className="prop-card__media">
         {hero ? (
-          <img src={hero} alt={title} loading="lazy" />
+          <SmartImage src={hero} alt={title} />
         ) : (
           <div className="prop-card__media-fallback" aria-hidden="true">
             <i className="fa-solid fa-building" />

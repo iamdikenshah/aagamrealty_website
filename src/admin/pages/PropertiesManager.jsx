@@ -7,6 +7,7 @@ import {
 } from "../../firebase/firestore";
 import { formatPriceRange } from "../../data/properties";
 import PropertyForm from "../components/PropertyForm";
+import SmartImage from "../../components/SmartImage.jsx";
 
 const STATUS_LABELS = {
   active: "Published",
@@ -209,7 +210,7 @@ export default function PropertiesManager() {
               <article key={p.id} className="admin-prop-card">
                 <div className="admin-prop-card__media">
                   {cover ? (
-                    <img src={cover} alt={p.title} loading="lazy" />
+                    <SmartImage src={cover} alt={p.title} />
                   ) : (
                     <div className="admin-prop-card__noimg">
                       <i className="fa-regular fa-image" aria-hidden="true" />

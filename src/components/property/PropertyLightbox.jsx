@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import SmartImage from "../SmartImage.jsx";
 
 /**
  * Fullscreen, tabbed image viewer (Adani-Realty style). Opens over the whole
@@ -145,7 +146,7 @@ export default function PropertyLightbox({ gallery, title, startIndex = 0, onClo
               aria-label={g.caption || g.category}
               title={`${g.category}${g.caption ? " · " + g.caption : ""}`}
             >
-              <img src={g.url} alt="" loading="lazy" />
+              <SmartImage src={g.url} alt="" />
             </button>
           );
         })}

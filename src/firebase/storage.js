@@ -35,10 +35,18 @@ function safeName(file) {
  * @param {(pct:number)=>void} [onProgress]  0–100
  * @returns {Promise<{url:string, path:string}>}
  */
+// Every upload lands at a unique, timestamped path and is never overwritten, so
+// the stored objects are effectively immutable. Tell browsers + the Storage CDN
+// to cache them hard (one year) so repeat visits load from cache instantly.
+const IMMUTABLE_CACHE = "public, max-age=31536000, immutable";
+
 function uploadTo(folder, ownerId, file, onProgress) {
   assertStorage();
   const path = `${folder}/${ownerId}/${safeName(file)}`;
-  const task = uploadBytesResumable(ref(storage, path), file);
+  const task = uploadBytesResumable(ref(storage, path), file, {
+    cacheControl: IMMUTABLE_CACHE,
+    contentType: file.type || undefined,
+  });
   return new Promise((resolve, reject) => {
     task.on(
       "state_changed",

@@ -1,0 +1,69 @@
+/* SmartImage: shimmering placeholder + fade-in for lazily loaded images.
+   Fills its (sized, positioned) parent; the real <img> keeps object-fit: cover
+   from the surrounding component styles. */
+
+.smart-img {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--light-gray, #edf1f8);
+}
+
+.smart-img img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.smart-img[data-status="loaded"] img { opacity: 1; }
+
+/* Placeholder layer — visible until the image loads, then fades away. */
+.smart-img__ph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--light-gray, #edf1f8);
+  color: var(--purple, #1b2a4a);
+  transition: opacity 0.4s ease;
+}
+.smart-img[data-status="loaded"] .smart-img__ph {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.smart-img__ph-icon {
+  width: 30%;
+  min-width: 26px;
+  max-width: 54px;
+  height: auto;
+  opacity: 0.32;
+}
+
+/* Animated sheen while loading (not while erroring). */
+.smart-img[data-status="loading"] .smart-img__ph::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 80%
+  );
+  transform: translateX(-100%);
+  animation: smart-img-shimmer 1.3s ease-in-out infinite;
+}
+
+@keyframes smart-img-shimmer {
+  to { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smart-img[data-status="loading"] .smart-img__ph::before { animation: none; }
+  .smart-img img { transition: none; }
+}
