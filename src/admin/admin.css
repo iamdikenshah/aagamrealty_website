@@ -281,6 +281,39 @@
 .admin-json { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.82rem; }
 .admin-json.is-invalid { border-color: #c0392b; }
 
+/* Segmented control (enquiry form: Residential / Commercial) */
+.admin-segmented { display: flex; gap: 10px; flex-wrap: wrap; }
+.admin-segmented__opt {
+  flex: 1; min-width: 150px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 16px; border-radius: var(--radius-sm);
+  border: 1px solid #d3dae8; background: var(--white); color: var(--charcoal);
+  font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.admin-segmented__opt i { color: var(--gold-2); transition: color 0.15s; }
+.admin-segmented__opt:hover { border-color: #b9c3d8; background: var(--light-gray); }
+.admin-segmented__opt.active {
+  border-color: var(--purple); background: var(--purple); color: var(--white);
+  box-shadow: 0 2px 8px rgba(27, 42, 74, 0.22);
+}
+.admin-segmented__opt.active i { color: var(--gold); }
+.admin-segmented.is-invalid .admin-segmented__opt { border-color: #c0392b; }
+
+/* Align the reused public LocationMultiSelect with admin inputs. */
+.admin-form .multiselect-trigger {
+  min-height: 40px; padding: 9px 11px; font-size: 0.9rem;
+  border-width: 1px; border-color: #d3dae8;
+}
+.admin-form .multiselect-trigger:hover { border-color: #b9c3d8; }
+.admin-form .multiselect.open .multiselect-trigger,
+.admin-form .multiselect-trigger:focus-visible {
+  border-color: var(--purple); box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.1);
+}
+.admin-form .multiselect-caret { font-size: 11px; color: var(--gray); }
+.admin-form .multiselect-panel { border-width: 1px; border-color: #e4e9f2; }
+.admin-form .ms-option { min-height: 38px; font-size: 0.9rem; }
+
 .admin-subrow { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; padding: 12px 0; border-bottom: 1px solid var(--light-gray); }
 .admin-subfield { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; flex: 1 1 110px; }
 .admin-gallery-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--light-gray); }
