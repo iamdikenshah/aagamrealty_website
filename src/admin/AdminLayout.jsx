@@ -64,7 +64,12 @@ export default function AdminLayout() {
           >
             <i className="fa-solid fa-bars" aria-hidden="true" />
           </button>
-          <span className="admin-topbar__user">{user?.email}</span>
+          {user?.email && (
+            <span className="admin-topbar__user">
+              <span className="admin-topbar__avatar" aria-hidden="true">{user.email[0]}</span>
+              {user.email}
+            </span>
+          )}
         </header>
 
         <main className="admin-content">
