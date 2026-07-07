@@ -7,7 +7,7 @@
 // access is gated by a custom claim (admin == true) in firestore.rules.
 // =============================================================================
 
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { app } from "./config";
 
 const auth = app ? getAuth(app) : null;
@@ -16,6 +16,26 @@ function assertAuth() {
   if (!auth) {
     throw new Error("Firebase is not configured (missing VITE_FB_* env). Cannot authenticate.");
   }
+}
+
+// Fan-out registry over Firebase auth state. We keep our own listener set (fed by
+// a single onAuthStateChanged) so we can ALSO push profile changes — updateProfile
+// does not re-fire onAuthStateChanged, yet the top bar / greeting must update.
+const listeners = new Set();
+let currentUser = null;
+let resolved = false; // true once Firebase has reported the initial state
+let started = false;
+
+function emit(user) {
+  currentUser = user;
+  resolved = true;
+  listeners.forEach((cb) => cb(user));
+}
+
+function ensureStarted() {
+  if (started || !auth) return;
+  started = true;
+  onAuthStateChanged(auth, emit);
 }
 
 /**
@@ -45,5 +65,23 @@ export function subscribeToAuthState(callback) {
     callback(null);
     return () => {};
   }
-  return onAuthStateChanged(auth, callback);
+  ensureStarted();
+  listeners.add(callback);
+  // Replay the known state to late subscribers, but not a premature `null`
+  // before Firebase has restored the session (that would bounce to /login).
+  if (resolved) callback(currentUser);
+  return () => listeners.delete(callback);
+}
+
+/**
+ * Update the signed-in admin's profile (currently just their display name) and
+ * notify all auth subscribers so the UI reflects it immediately.
+ * @param {{ displayName?: string }} profile
+ */
+export async function updateAdminProfile({ displayName }) {
+  assertAuth();
+  if (!auth.currentUser) throw new Error("You're signed out. Please sign in again.");
+  await updateProfile(auth.currentUser, { displayName: (displayName ?? "").trim() });
+  await auth.currentUser.reload();
+  emit(auth.currentUser);
 }

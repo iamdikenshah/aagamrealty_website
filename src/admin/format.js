@@ -29,6 +29,13 @@ export function timeAgo(ts) {
   return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
+/** The admin's display name: their set name, else the email's local part. */
+export function adminName(user) {
+  const dn = user?.displayName?.trim();
+  if (dn) return dn;
+  return user?.email ? user.email.split("@")[0] : "";
+}
+
 /** Up to two uppercase initials from a name ("Riya Shah" → "RS"). */
 export function initials(name) {
   const parts = (name || "").trim().split(/\s+/).filter(Boolean);

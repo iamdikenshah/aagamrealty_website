@@ -19,6 +19,7 @@ import TestimonialsManager from "./pages/TestimonialsManager";
 import EnquiriesInbox from "./pages/EnquiriesInbox";
 import ListsManager from "./pages/ListsManager";
 import FaqsManager from "./pages/FaqsManager";
+import Settings from "./pages/Settings";
 import "./admin.css";
 
 export default function AdminApp() {
@@ -39,6 +40,7 @@ export default function AdminApp() {
           <Route path="enquiries" element={<EnquiriesInbox />} />
           <Route path="lists" element={<ListsManager />} />
           <Route path="faqs" element={<FaqsManager />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
         {/* Unknown admin path → dashboard (which itself bounces to login if needed). */}
         <Route path="*" element={<Navigate to="/" replace />} />

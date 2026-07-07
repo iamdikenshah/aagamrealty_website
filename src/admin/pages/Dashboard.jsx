@@ -34,7 +34,10 @@ export default function Dashboard() {
   const published = properties.filter((p) => p.status === "active").length;
   const drafts = properties.filter((p) => (p.status || "active") !== "active").length;
   const newEnquiries = enquiries.filter((e) => e.status === "new").length;
-  const name = (user?.email || "").split("@")[0];
+  // Prefer the admin's set name; otherwise a capitalised email local-part.
+  const dn = user?.displayName?.trim();
+  const emailPrefix = (user?.email || "").split("@")[0];
+  const name = dn || (emailPrefix ? emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1) : "");
 
   const stats = [
     { key: "props", label: "Properties", value: properties.length, sub: `${published} published · ${drafts} draft`, to: "/properties", icon: "fa-building" },
@@ -52,7 +55,7 @@ export default function Dashboard() {
       <header className="admin-hero">
         <div className="admin-hero__text">
           <p className="admin-hero__eyebrow">{greeting()}</p>
-          <h1 className="admin-hero__title">{name ? name.charAt(0).toUpperCase() + name.slice(1) : "Welcome back"}</h1>
+          <h1 className="admin-hero__title">{name || "Welcome back"}</h1>
           <p className="admin-hero__sub">Here's what's happening across Aagam Realty today.</p>
         </div>
         <div className="admin-hero__actions">

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { signOutAdmin } from "../firebase/auth";
 import { useAuth } from "./useAuth";
+import { adminName, initials } from "./format";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: "fa-gauge", end: true },
@@ -10,6 +11,7 @@ const NAV = [
   { to: "/enquiries", label: "Enquiries", icon: "fa-inbox" },
   { to: "/lists", label: "Lists", icon: "fa-list-check" },
   { to: "/faqs", label: "FAQs", icon: "fa-circle-question" },
+  { to: "/settings", label: "Settings", icon: "fa-gear" },
 ];
 
 export default function AdminLayout() {
@@ -66,8 +68,8 @@ export default function AdminLayout() {
           </button>
           {user?.email && (
             <span className="admin-topbar__user">
-              <span className="admin-topbar__avatar" aria-hidden="true">{user.email[0]}</span>
-              {user.email}
+              <span className="admin-topbar__avatar" aria-hidden="true">{initials(adminName(user))}</span>
+              {adminName(user)}
             </span>
           )}
         </header>

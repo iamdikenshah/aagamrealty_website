@@ -408,6 +408,13 @@
 .admin-field__err { color: #c0392b; font-size: 0.8rem; }
 .admin-field__hint-sm { color: var(--gray); font-size: 0.76rem; font-weight: 400; }
 
+/* --- Settings --------------------------------------------------------------- */
+.admin-profile-row { display: flex; align-items: center; gap: 14px; }
+.admin-profile-row .admin-avatar { width: 52px; height: 52px; font-size: 1rem; }
+.admin-profile-row__name { font-weight: 700; font-size: 1.05rem; color: var(--charcoal); }
+.admin-field input:disabled { background: #f2f5fa; color: var(--gray); cursor: not-allowed; }
+.admin-save-ok { display: inline-flex; align-items: center; gap: 8px; color: #1e7d3c; font-weight: 600; font-size: 0.9rem; margin: 0; }
+
 /* Red border on any control inside an errored field. */
 .admin-field--invalid input,
 .admin-field--invalid textarea,
