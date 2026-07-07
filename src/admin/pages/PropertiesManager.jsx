@@ -8,10 +8,10 @@ import {
 import PropertyForm from "../components/PropertyForm";
 
 const STATUS_LABELS = {
-  active: "Active",
+  active: "Published",
+  draft: "Unpublished",
   sold: "Sold",
   rented: "Rented",
-  draft: "Draft",
 };
 
 export default function PropertiesManager() {
@@ -38,18 +38,45 @@ export default function PropertiesManager() {
         setEditing(null);
         load();
       } else {
-        // New listing → create it, then stay on the form in EDIT mode so the
-        // gallery uploader (which needs the saved id as its Storage folder)
-        // unlocks and the admin can add images without losing their work.
+        // New listing → create it as a draft, then stay on the form in EDIT mode
+        // so the gallery uploader (which needs the saved id as its Storage folder)
+        // unlocks and the admin can add images. Uploads auto-save from here.
         await addProperty(id, data);
         load();
         setEditing({ id, ...data });
-        alert("Property created. You can now upload gallery files below, then Save changes.");
+        alert("Property created as a draft. Upload at least one image, then Save or Publish it.");
       }
     } catch (err) {
       alert(`Could not save: ${err.message || err}`);
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Persist gallery changes immediately (called by the form on upload/remove in
+  // edit mode) so images aren't lost if the admin forgets to press Save.
+  const persistGallery = async (gallery) => {
+    if (!editing?.id) return;
+    try {
+      await updateProperty(editing.id, { gallery });
+      setEditing((e) => (e ? { ...e, gallery } : e));
+    } catch (err) {
+      console.error("Could not auto-save gallery:", err);
+    }
+  };
+
+  // Publish (show on site) / unpublish (hide but keep). Publishing needs ≥1 image.
+  const togglePublish = async (item) => {
+    const publish = item.status !== "active";
+    if (publish && !(item.gallery && item.gallery.length)) {
+      alert("Add at least one image before publishing this property.");
+      return;
+    }
+    try {
+      await updateProperty(item.id, { status: publish ? "active" : "draft" });
+      load();
+    } catch (err) {
+      alert(`Could not update: ${err.message || err}`);
     }
   };
 
@@ -75,6 +102,7 @@ export default function PropertiesManager() {
           saving={saving}
           onSubmit={handleSave}
           onCancel={() => setEditing(null)}
+          onGalleryPersist={persistGallery}
         />
       </div>
     );
@@ -122,6 +150,11 @@ export default function PropertiesManager() {
                   <td>{p.featured ? "★" : "—"}</td>
                   <td className="admin-row-actions">
                     <button className="admin-btn admin-btn--sm" onClick={() => setEditing(p)}>Edit</button>
+                    {p.status === "active" ? (
+                      <button className="admin-btn admin-btn--sm admin-btn--danger-solid" onClick={() => togglePublish(p)}>Unpublish</button>
+                    ) : (
+                      <button className="admin-btn admin-btn--sm admin-btn--success" onClick={() => togglePublish(p)}>Publish</button>
+                    )}
                     <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => handleDelete(p)}>
                       Delete
                     </button>

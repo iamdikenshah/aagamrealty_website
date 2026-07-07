@@ -6,6 +6,7 @@ import Stats from "./components/Stats";
 import Testimonials from "./components/Testimonials";
 import FaqSection from "./components/FaqSection";
 import About from "./components/About";
+import NotFound from "./components/NotFound";
 import EnquiryModal from "./components/EnquiryModal";
 import Footer from "./components/Footer";
 import WhatsAppFloat from "./components/WhatsAppFloat";
@@ -82,7 +83,9 @@ function Router() {
     if (!id) return <Redirect to="/properties" />;
     return <PropertyDetail id={id} />;
   }
-  return <Home />;
+  if (path === "/" || path === "") return <Home />;
+  // Anything else is an unknown URL → branded 404 (not a silent home fallback).
+  return <NotFound />;
 }
 
 export default function App() {
@@ -127,7 +130,7 @@ export default function App() {
   // public site chrome (navbar/footer/enquiry modal) and behind Suspense so its
   // code-split chunk loads on demand. 404.html already preserves deep links like
   // /admin/properties, so a direct hit lands here after the SPA restore.
-  if (path.startsWith("/admin")) {
+  if (path === "/admin" || path.startsWith("/admin/")) {
     return (
       <Suspense
         fallback={

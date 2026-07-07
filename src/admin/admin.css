@@ -118,6 +118,10 @@
 .admin-btn--primary:hover { background: var(--purple-dark); }
 .admin-btn--danger { color: #c0392b; border-color: #eabfb9; }
 .admin-btn--danger:hover { background: #fdecea; }
+.admin-btn--success { background: #1e7d3c; border-color: #1e7d3c; color: var(--white); }
+.admin-btn--success:hover { background: #196e34; }
+.admin-btn--danger-solid { background: #c0392b; border-color: #c0392b; color: var(--white); }
+.admin-btn--danger-solid:hover { background: #a93226; }
 .admin-btn--sm { padding: 6px 11px; font-size: 0.82rem; }
 
 /* --- Tiles (dashboard) ------------------------------------------------------ */

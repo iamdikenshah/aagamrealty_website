@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { propertyCategoryOptions, configurationOptions } from "../../data/content";
 import { getNames, addListItem, propertyIdExists, LISTS } from "../../firebase/firestore";
 import ImageUploader, { GALLERY_TYPES } from "./ImageUploader";
@@ -8,7 +8,6 @@ import AdminSelect from "./AdminSelect";
 const CATEGORIES = ["residential", "commercial"];
 const TRANSACTIONS = ["rent", "buy", "pre-lease"];
 const LISTING_TYPES = ["rental", "owned", "pre-lease", "land"];
-const STATUSES = ["active", "sold", "rented", "draft"];
 const PRICE_UNITS = ["Cr", "Lac", "per month", "per sqft"];
 const AREA_UNITS = ["sqft", "sq.yd", "sq.m", "acre"];
 const PURCHASE_TYPES = ["New Booking", "Resale", "Pre-Leased"];
@@ -24,7 +23,7 @@ const EMPTY = {
   category: "residential",
   transaction: "buy",
   listingType: "owned",
-  status: "active",
+  status: "draft", // new listings start unpublished
   featured: false,
   developer: "",
   locality: "",
@@ -66,12 +65,10 @@ function Field({ label, error, children, wide }) {
   );
 }
 
-export default function PropertyForm({ initial, saving, onSubmit, onCancel }) {
+export default function PropertyForm({ initial, saving, onSubmit, onCancel, onGalleryPersist }) {
   const isEdit = !!initial?.id;
   const [values, setValues] = useState(() => ({ ...EMPTY, ...(initial || {}), rera: { ...EMPTY.rera, ...(initial?.rera || {}) }, location: { ...EMPTY.location, ...(initial?.location || {}) } }));
   const [errors, setErrors] = useState({});
-  const [idEdited, setIdEdited] = useState(isEdit); // once user types an id, stop auto-slugging
-  const [checkingId, setCheckingId] = useState(false);
 
   // Managed reference lists → dropdown options.
   const [lists, setLists] = useState({ developers: [], localities: [], amenities: [], keyFeatures: [] });
@@ -88,13 +85,25 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel }) {
     return () => { active = false; };
   }, []);
 
+  // Auto-save the gallery to Firestore in edit mode, so uploaded/removed images
+  // persist even if the admin doesn't press "Save changes". Skips the initial
+  // load (only writes once the gallery actually differs from what was loaded).
+  const loadedGallery = useRef(JSON.stringify(initial?.gallery || []));
+  useEffect(() => {
+    if (!isEdit || !onGalleryPersist) return;
+    if (JSON.stringify(values.gallery) === loadedGallery.current) return;
+    const t = setTimeout(() => onGalleryPersist(values.gallery), 500);
+    return () => clearTimeout(t);
+  }, [values.gallery]);
+
   const set = (key, value) => setValues((v) => ({ ...v, [key]: value }));
   const setNested = (obj, key, value) => setValues((v) => ({ ...v, [obj]: { ...v[obj], [key]: value } }));
   const clearErr = (key) => setErrors((e) => (e[key] ? { ...e, [key]: undefined } : e));
 
-  // Auto-suggest the id from the title until the admin edits the id themselves.
+  // The id is derived from the title for new listings (it's a backend key, never
+  // shown to the admin) and is fixed once the property exists.
   const onTitleChange = (title) => {
-    setValues((v) => ({ ...v, title, ...(idEdited || isEdit ? {} : { id: slugify(title) }) }));
+    setValues((v) => ({ ...v, title, ...(isEdit ? {} : { id: slugify(title) }) }));
     clearErr("title");
   };
 
@@ -186,12 +195,9 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel }) {
       idx === i ? (v === CUSTOM ? { ...c, _custom: true } : { ...c, _custom: false, config: v }) : c
     ));
 
-  const validate = async () => {
+  const validate = () => {
     const e = {};
     if (!values.title.trim()) e.title = "Title is required.";
-    const id = values.id.trim();
-    if (!id) e.id = "Property ID is required.";
-    else if (!/^[a-z0-9-]+$/.test(id)) e.id = "Use lowercase letters, numbers and hyphens only.";
     if (!values.locality) e.locality = "Locality is required.";
     if (values.priceMin === "" || values.priceMin == null) e.priceMin = "Minimum price is required.";
     else if (Number(values.priceMin) < 0) e.priceMin = "Must be 0 or more.";
@@ -199,33 +205,25 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel }) {
       e.priceMax = "Max can't be less than min.";
     if (descWords > MAX_DESC_WORDS) e.description = `Description is ${descWords} words — max ${MAX_DESC_WORDS}.`;
     values.nearby.forEach((n, i) => { if (!n.label.trim()) e[`nearby-${i}`] = "Title required."; });
-
-    // Uniqueness check for a new id (only if format is otherwise valid).
-    if (!isEdit && id && !e.id) {
-      setCheckingId(true);
-      try {
-        if (await propertyIdExists(id)) e.id = `A property with id "${id}" already exists.`;
-      } catch { /* ignore — surfaces on save */ } finally { setCheckingId(false); }
-    }
     return e;
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const e = await validate();
-    setErrors(e);
-    if (Object.keys(e).some((k) => e[k])) {
-      const first = document.querySelector(".admin-field__err");
-      first?.scrollIntoView({ behavior: "smooth", block: "center" });
-      return;
-    }
+  // Derive a unique backend id from the title (append -2, -3… on collision).
+  const makeUniqueId = async (base) => {
+    const root = base || "property";
+    let id = root;
+    let n = 2;
+    // eslint-disable-next-line no-await-in-loop
+    while (await propertyIdExists(id)) { id = `${root}-${n}`; n += 1; }
+    return id;
+  };
 
-    const data = stripUndefined({
+  const buildData = (status) => stripUndefined({
       title: values.title.trim(),
       category: values.category,
       transaction: values.transaction,
       listingType: values.listingType,
-      status: values.status,
+      status,
       featured: !!values.featured,
       developer: values.developer.trim() || undefined,
       locality: values.locality,
@@ -279,31 +277,37 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel }) {
         : undefined,
     });
 
-    onSubmit(values.id.trim(), data);
+  // Lifecycle: create (draft, no image needed) → save/publish (need ≥1 image) →
+  // unpublish (hidden from the site but kept). Save keeps the current publish
+  // state; Publish sets it live; Unpublish hides it.
+  const submitForm = async (action) => {
+    const e = validate();
+    if ((action === "save" || action === "publish") && values.gallery.length === 0) {
+      e.gallery = "Please upload at least one image before saving or publishing.";
+    }
+    setErrors(e);
+    if (Object.keys(e).some((k) => e[k])) {
+      document.querySelector(".admin-field__err")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    let id = values.id.trim();
+    if (!isEdit) {
+      id = await makeUniqueId(slugify(values.title));
+      setValues((v) => ({ ...v, id, status: "draft" })); // keep the id for the gallery uploader in edit mode
+    }
+    const status = action === "publish" ? "active" : action === "unpublish" ? "draft" : (isEdit ? values.status : "draft");
+    onSubmit(id, buildData(status));
   };
 
   return (
-    <form className="admin-form" onSubmit={handleSubmit} noValidate>
+    <form className="admin-form" onSubmit={(e) => { e.preventDefault(); submitForm(isEdit ? "save" : "create"); }} noValidate>
       {/* --- Basics --- */}
       <section className="admin-form__section">
         <h2 className="admin-form__legend">Basics</h2>
         <div className="admin-grid">
           <Field label="Title *" error={errors.title} wide>
             <input type="text" value={values.title} onChange={(e) => onTitleChange(e.target.value)} />
-          </Field>
-
-          <Field label="Property ID *" error={errors.id} wide>
-            <input
-              type="text"
-              value={values.id}
-              disabled={isEdit}
-              placeholder="e.g. shantigram-skyline"
-              onChange={(e) => { setIdEdited(true); set("id", e.target.value); clearErr("id"); }}
-            />
-            <small className="admin-muted">
-              {isEdit ? "The ID can't be changed after creation." : "Used in the URL and as the image folder. Lowercase, hyphens."}
-              {checkingId && " · checking…"}
-            </small>
           </Field>
 
           <Field label="Category">
@@ -314,9 +318,6 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel }) {
           </Field>
           <Field label="Listing type">
             <AdminSelect value={values.listingType} onChange={(v) => set("listingType", v)} options={LISTING_TYPES} />
-          </Field>
-          <Field label="Status">
-            <AdminSelect value={values.status} onChange={(v) => set("status", v)} options={STATUSES} />
           </Field>
 
           <Field label="Property type">
@@ -448,14 +449,16 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel }) {
       {/* --- Gallery --- */}
       <section className="admin-form__section">
         <h2 className="admin-form__legend">Gallery</h2>
+        {isEdit && <p className="admin-muted admin-form__hint" style={{ margin: "0 0 12px" }}>Uploaded images are saved automatically.</p>}
         <ImageUploader
           folder="properties"
           ownerId={values.id}
           accept={GALLERY_TYPES}
           disabled={!isEdit}
-          disabledHint="Save the property first, then upload files here (they're stored under its ID)."
+          disabledHint="Create the property first, then upload at least one image here."
           onUploaded={onImageUploaded}
         />
+        {errors.gallery && <p className="admin-field__err" style={{ margin: "10px 0 0" }}>{errors.gallery}</p>}
         {values.gallery.map((g, i) => {
           const isImage = g.contentType ? g.contentType.startsWith("image/") : !/\.pdf$/i.test(g.url || "");
           return (
@@ -536,7 +539,16 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel }) {
 
       <div className="admin-form__actions">
         <button type="button" className="admin-btn" onClick={onCancel} disabled={saving}>Cancel</button>
-        <button type="submit" className="admin-btn admin-btn--primary" disabled={saving || checkingId}>
+        {isEdit && (values.status === "active" ? (
+          <button type="button" className="admin-btn admin-btn--danger-solid" onClick={() => submitForm("unpublish")} disabled={saving}>
+            <i className="fa-solid fa-eye-slash" aria-hidden="true" /> Unpublish
+          </button>
+        ) : (
+          <button type="button" className="admin-btn admin-btn--success" onClick={() => submitForm("publish")} disabled={saving}>
+            <i className="fa-solid fa-globe" aria-hidden="true" /> Publish
+          </button>
+        ))}
+        <button type="submit" className="admin-btn admin-btn--primary" disabled={saving}>
           {saving ? "Saving…" : isEdit ? "Save changes" : "Create property"}
         </button>
       </div>
