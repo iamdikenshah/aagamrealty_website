@@ -362,6 +362,7 @@
 
 /* --- Field errors ----------------------------------------------------------- */
 .admin-field__err { color: #c0392b; font-size: 0.8rem; }
+.admin-field__hint-sm { color: var(--gray); font-size: 0.76rem; font-weight: 400; }
 
 /* Red border on any control inside an errored field. */
 .admin-field--invalid input,
@@ -684,7 +685,23 @@
 .admin-enq__name { font-weight: 700; font-size: 0.98rem; display: inline-flex; align-items: center; gap: 8px; }
 .admin-enq__unread { width: 8px; height: 8px; border-radius: 50%; background: #1e7d3c; box-shadow: 0 0 0 3px rgba(30, 125, 60, 0.18); }
 .admin-enq__time { margin-left: auto; color: var(--gray); font-size: 0.8rem; white-space: nowrap; }
+.admin-enq__src {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px; border-radius: 999px;
+  background: var(--light-gray); color: var(--gray);
+  font-size: 0.72rem; font-weight: 700;
+}
+.admin-enq__src i { color: var(--gold-2); font-size: 0.72rem; }
 .admin-enq__contact { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 0.85rem; }
+.admin-enq__meta { display: flex; flex-wrap: wrap; gap: 8px; }
+.admin-enq__chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 11px; border-radius: 999px;
+  background: rgba(27, 42, 74, 0.06); color: var(--purple);
+  font-size: 0.78rem; font-weight: 600;
+}
+.admin-enq__chip i { font-size: 0.72rem; opacity: 0.85; }
+.admin-enq__chip.is-due { background: #fdecea; color: #c0392b; }
 .admin-enq__contact a { color: var(--purple); display: inline-flex; align-items: center; gap: 6px; }
 .admin-enq__contact a:hover { text-decoration: underline; }
 .admin-enq__contact i { color: var(--gold-2); }

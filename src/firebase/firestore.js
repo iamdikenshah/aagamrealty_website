@@ -25,6 +25,7 @@ import {
   query,
   where,
   serverTimestamp,
+  Timestamp,
 } from "firebase/firestore";
 import { app, isConfigured } from "./config";
 
@@ -211,6 +212,40 @@ export async function addEnquiry(data) {
     status: "new",
     createdAt: serverTimestamp(),
   });
+}
+
+/**
+ * Admin: manually log a lead that arrived off the website (phone, walk-in,
+ * WhatsApp, referral…). Same collection + shape as website enquiries so it shows
+ * up in the inbox alongside them, plus a few optional CRM fields (budget,
+ * follow-up date) that older/website docs simply don't carry.
+ * @param {{
+ *   name:string, phone:string, email?:string, message?:string,
+ *   propertyId?:string|null, source?:string,
+ *   status?:"new"|"contacted"|"closed", budget?:string, followUpAt?:Date|null
+ * }} data
+ */
+export async function addEnquiryAdmin(data) {
+  assertDb();
+  const doc = {
+    name: (data.name ?? "").trim(),
+    phone: (data.phone ?? "").trim(),
+    email: (data.email ?? "").trim(),
+    message: (data.message ?? "").trim(),
+    propertyId: data.propertyId || null,
+    source: data.source || "manual",
+    status: data.status || "new",
+    createdAt: serverTimestamp(),
+  };
+  // Only persist the optional CRM fields when they carry a value, so docs stay
+  // clean and the inbox can treat their absence as "not set".
+  const budget = (data.budget ?? "").trim();
+  if (budget) doc.budget = budget;
+  if (data.followUpAt instanceof Date && !isNaN(data.followUpAt)) {
+    doc.followUpAt = Timestamp.fromDate(data.followUpAt);
+  }
+  const ref = await addDoc(collection(db, ENQUIRIES), doc);
+  return ref.id;
 }
 
 /** Admin: all enquiries, newest-first. */

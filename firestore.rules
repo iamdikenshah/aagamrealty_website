@@ -49,13 +49,17 @@ service cloud.firestore {
     // admin has full access. The create rule pins the incoming shape so the
     // endpoint can't be abused to write arbitrary documents.
     match /enquiries/{enquiryId} {
-      allow create: if request.resource.data.status == 'new'
-                    && request.resource.data.source is string
-                    && request.resource.data.name is string
-                    && request.resource.data.phone is string
-                    && request.resource.data.keys().hasOnly(
-                         ['name', 'phone', 'email', 'message', 'propertyId', 'source', 'status', 'createdAt']
-                       );
+      // Admin may log leads manually (any status, plus optional CRM fields like
+      // budget/followUpAt). The public endpoint stays pinned to a strict shape so
+      // it can't be abused to write arbitrary documents.
+      allow create: if isAdmin()
+                    || (request.resource.data.status == 'new'
+                        && request.resource.data.source is string
+                        && request.resource.data.name is string
+                        && request.resource.data.phone is string
+                        && request.resource.data.keys().hasOnly(
+                             ['name', 'phone', 'email', 'message', 'propertyId', 'source', 'status', 'createdAt']
+                           ));
       allow read, update, delete: if isAdmin();
     }
 
