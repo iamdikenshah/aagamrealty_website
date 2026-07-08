@@ -88,7 +88,7 @@ function onEnquirySubmit(e) {
 function plainText(rows, submittedAt) {
   var lines = rows.map(function (r) { return r.label + ": " + r.value; });
   if (submittedAt) lines.push("Submitted: " + submittedAt);
-  return "New website enquiry\n\n" + lines.join("\n");
+  return "New property enquiry\n\n" + lines.join("\n");
 }
 
 function esc(s) {
@@ -150,7 +150,7 @@ function renderEmail(data) {
       // Header bar
       '<tr><td style="background:' + BRAND.navy + ';padding:22px 24px;">' +
         '<div style="color:' + BRAND.gold + ';font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;">' + esc(BRAND.name) + '</div>' +
-        '<div style="color:#ffffff;font-size:20px;font-weight:700;margin-top:4px;">New Website Enquiry</div>' +
+        '<div style="color:#ffffff;font-size:20px;font-weight:700;margin-top:4px;">New Property Enquiry</div>' +
       '</td></tr>' +
       // Contact highlight
       '<tr><td style="padding:22px 24px 6px;">' +
