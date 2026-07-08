@@ -14,26 +14,33 @@ and no Firebase billing.
 The script ([`enquiry-email-notification.gs`](./enquiry-email-notification.gs))
 is kept in the repo as the source of truth, but it **runs in Google Apps
 Script**, not in the website bundle. Edit it here, then paste it into Apps Script.
+`onEnquirySubmit` handles both a **form-bound** trigger (the event carries a
+`FormResponse`) and a **sheet-bound** one (the event carries the appended row),
+so it works in either kind of project — including the existing form-bound
+project that holds `setupAagamEnquiryFields`.
 
 ## One-time setup
 
-1. Open the **Google Sheet** that collects this form's responses
-   (Form editor → **Responses** tab → green Sheets icon → *View in Sheets*).
-2. In the Sheet: **Extensions → Apps Script**.
-3. Delete the default `Code.gs` contents and **paste in the whole**
-   [`enquiry-email-notification.gs`](./enquiry-email-notification.gs). **Save** (💾).
-4. Left sidebar → **Triggers** (⏰) → **Add Trigger**:
+1. Open the Apps Script project:
+   - **Form-bound** (recommended, and where the form-setup code already lives):
+     open the Form → **⋮ (More)** → **Script editor**; **or**
+   - **Sheet-bound:** open the responses **Google Sheet** → **Extensions →
+     Apps Script**.
+2. **Add** [`enquiry-email-notification.gs`](./enquiry-email-notification.gs) as a
+   new script file (＋ → Script), paste it in, and **Save** (💾). It can sit
+   alongside other functions in the same project.
+3. Left sidebar → **Triggers** (⏰) → **Add Trigger**:
    | Field | Value |
    |-------|-------|
    | Choose which function to run | `onEnquirySubmit` |
    | Choose which deployment | `Head` |
-   | Select event source | `From spreadsheet` |
+   | Select event source | `From form` (form-bound) — or `From spreadsheet` (sheet-bound) |
    | Select event type | `On form submit` |
-5. **Save** → Google shows an authorization prompt. Choose your account →
+4. **Save** → Google shows an authorization prompt. Choose your account →
    *Advanced* → *Go to (project)* → **Allow** (it needs permission to send email
    as you). This is required because sending mail needs an **installable**
    trigger.
-6. **Test:** submit the website enquiry form once and check your inbox.
+5. **Test:** submit the website enquiry form once and check your inbox.
 
 ## What the email contains
 

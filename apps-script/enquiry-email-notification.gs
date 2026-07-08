@@ -6,24 +6,25 @@
  * Form, so a single "On form submit" trigger on the linked Google Sheet emails
  * you a nicely formatted summary for every lead.
  *
- * The renderer is generic: it reads the Sheet's header row and shows every
- * non-empty question/answer pair, so it keeps working even if you add, rename
- * or reorder form questions later.
+ * The renderer is generic: it lists every non-empty question/answer pair from
+ * the submission, so it keeps working even if you add, rename or reorder form
+ * questions later. onEnquirySubmit works whether the project is bound to the
+ * Form (event carries a FormResponse) or to the responses Sheet (event carries
+ * the appended row) — so it can live in the same project as the form-setup code.
  *
  * ── SETUP (one time) ──────────────────────────────────────────────────────
- *  1. Open the Google Sheet that collects this form's responses.
- *  2. Extensions → Apps Script.
- *  3. Paste this whole file in, replacing the default Code.gs. Save.
- *  4. Triggers (clock icon on the left) → Add Trigger:
- *        • Function to run:            onEnquirySubmit
- *        • Deployment:                 Head
- *        • Event source:               From spreadsheet
- *        • Event type:                 On form submit
+ *  1. Open the Apps Script project (Form → ⋮ → Script editor, or the Sheet →
+ *     Extensions → Apps Script). Paste this file in as a new file. Save.
+ *  2. Triggers (clock icon on the left) → Add Trigger:
+ *        • Function to run:   onEnquirySubmit
+ *        • Deployment:        Head
+ *        • Event source:      From form   (form-bound)  — or
+ *                             From spreadsheet   (sheet-bound)
+ *        • Event type:        On form submit
  *     Save, then approve the Google authorization prompt (it needs permission
  *     to send email as you). An *installable* trigger is required — a plain
  *     onFormSubmit simple trigger can't send mail.
- *  5. Test: submit the website form once (or use "Run → onEnquirySubmit" after
- *     a real submission exists) and check your inbox.
+ *  3. Test: submit the website form once and check your inbox.
  * ──────────────────────────────────────────────────────────────────────────
  */
 
@@ -37,27 +38,18 @@ var BRAND = {
 };
 
 /**
- * Installable "On form submit" trigger entry point.
- * @param {GoogleAppsScript.Events.SheetsOnFormSubmit} e
+ * Installable "On form submit" trigger entry point. Handles both a form-bound
+ * event (e.response is a FormResponse) and a sheet-bound event (e.values +
+ * e.range), so it runs correctly in either kind of Apps Script project.
+ * @param {GoogleAppsScript.Events.FormsOnFormSubmit|GoogleAppsScript.Events.SheetsOnFormSubmit} e
  */
 function onEnquirySubmit(e) {
-  if (!e || !e.values || !e.range) return; // ignore manual/empty runs
+  if (!e) return; // ignore manual/empty runs
+  var extracted = e.response ? fromFormEvent(e) : fromSheetEvent(e);
+  if (!extracted || !extracted.rows.length) return;
 
-  var sheet = e.range.getSheet();
-  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  var values = e.values;
-
-  // Pair each column header with the submitted value; drop empties and the
-  // Sheet's automatic Timestamp column (shown separately in the footer).
-  var rows = [];
-  var submittedAt = "";
-  for (var i = 0; i < headers.length; i++) {
-    var label = String(headers[i] == null ? "" : headers[i]).trim();
-    var value = String(values[i] == null ? "" : values[i]).trim();
-    if (!label || !value) continue;
-    if (/timestamp/i.test(label)) { submittedAt = value; continue; }
-    rows.push({ label: label, value: value });
-  }
+  var rows = extracted.rows;
+  var submittedAt = extracted.submittedAt;
 
   // Fuzzy-match the key fields for the subject line and the highlight card.
   var find = function (re) {
@@ -69,7 +61,7 @@ function onEnquirySubmit(e) {
   var email = find(/e-?mail/i);
   var requirement = find(/requirement|looking\s*for/i);
 
-  var subject = "New enquiry" + (name ? " — " + name : "") +
+  var subject = "New property enquiry" + (name ? " — " + name : "") +
     (requirement ? " (" + requirement + ")" : "");
 
   var options = {
@@ -80,6 +72,49 @@ function onEnquirySubmit(e) {
   if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) options.replyTo = email;
 
   MailApp.sendEmail(NOTIFY_TO, subject, plainText(rows, submittedAt), options);
+}
+
+/**
+ * Form-bound "On form submit": the event carries a FormResponse. Read each
+ * answered question's title + value (only answered items are present).
+ */
+function fromFormEvent(e) {
+  var items = e.response.getItemResponses();
+  var rows = [];
+  for (var i = 0; i < items.length; i++) {
+    var label = String(items[i].getItem().getTitle() || "").trim();
+    var ans = items[i].getResponse();
+    // Checkbox / grid answers come back as arrays — flatten to a readable list.
+    var value = Array.isArray(ans) ? ans.join(", ") : String(ans == null ? "" : ans).trim();
+    if (label && value) rows.push({ label: label, value: value });
+  }
+  var ts = e.response.getTimestamp();
+  var submittedAt = ts
+    ? Utilities.formatDate(ts, Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss")
+    : "";
+  return { rows: rows, submittedAt: submittedAt };
+}
+
+/**
+ * Sheet-bound "On form submit": the event carries the appended row (e.values)
+ * and its range. Pair each column header with its value; drop empties and the
+ * Sheet's automatic Timestamp column (shown separately in the footer).
+ */
+function fromSheetEvent(e) {
+  if (!e.values || !e.range) return null;
+  var sheet = e.range.getSheet();
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var values = e.values;
+  var rows = [];
+  var submittedAt = "";
+  for (var i = 0; i < headers.length; i++) {
+    var label = String(headers[i] == null ? "" : headers[i]).trim();
+    var value = String(values[i] == null ? "" : values[i]).trim();
+    if (!label || !value) continue;
+    if (/timestamp/i.test(label)) { submittedAt = value; continue; }
+    rows.push({ label: label, value: value });
+  }
+  return { rows: rows, submittedAt: submittedAt };
 }
 
 // ── Rendering ────────────────────────────────────────────────────────────────
