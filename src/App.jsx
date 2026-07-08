@@ -86,6 +86,9 @@ function Router() {
     return <PropertyDetail id={id} />;
   }
   if (path === "/" || path === "") return <Home />;
+  // Shared enquiry link — render the homepage underneath; App opens the enquiry
+  // modal on top and normalises the URL back to "/".
+  if (path === "/enquiry" || path === "/enquiry/") return <Home />;
   // Anything else is an unknown URL → branded 404 (not a silent home fallback).
   return <NotFound />;
 }
@@ -126,6 +129,18 @@ export default function App() {
 
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
+  }, []);
+
+  // Shareable enquiry link: "/enquiry" (or any URL with "?enquiry") lands the
+  // visitor straight on the enquiry form. After they submit or close it they're
+  // on the homepage, free to explore — so we normalise the URL back to "/" and
+  // let the modal sit on top. Runs once on initial load.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const wantsEnquiry = window.location.pathname === "/enquiry" || params.has("enquiry");
+    if (!wantsEnquiry) return;
+    openEnquiry("shared_link");
+    navigate("/", { replace: true, scrollToTop: false });
   }, []);
 
   // The admin CMS is its own self-contained surface — render it without the
