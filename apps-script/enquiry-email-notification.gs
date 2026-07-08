@@ -35,6 +35,8 @@ var BRAND = {
   navy: "#1B2A4A",
   gold: "#C9A34E",
   bg: "#f4f5f7",
+  // Light logo (for the dark header). Hosted on the live site; Gmail loads it.
+  logo: "https://aagamrealty.com/images/app_logo_footer.png",
 };
 
 /**
@@ -209,8 +211,9 @@ function renderEmail(data) {
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(16,24,40,.08);">' +
       // Header bar
       '<tr><td style="background:' + BRAND.navy + ';padding:22px 24px;">' +
-        '<div style="color:' + BRAND.gold + ';font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;">' + esc(BRAND.name) + '</div>' +
-        '<div style="color:#ffffff;font-size:20px;font-weight:700;margin-top:4px;">New Property Enquiry</div>' +
+        '<img src="' + BRAND.logo + '" alt="' + esc(BRAND.name) + '" width="150" ' +
+          'style="display:block;border:0;outline:none;text-decoration:none;height:auto;margin:0 0 14px;">' +
+        '<div style="color:#ffffff;font-size:20px;font-weight:700;">New Property Enquiry</div>' +
       '</td></tr>' +
       // Contact highlight
       '<tr><td style="padding:22px 24px 6px;">' +
