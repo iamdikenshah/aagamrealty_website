@@ -75,6 +75,31 @@ function onEnquirySubmit(e) {
 }
 
 /**
+ * MANUAL TEST — run this from the editor (Run ▸ sendTestEmail) to debug delivery.
+ * It sends a sample notification to NOTIFY_TO directly, bypassing the trigger.
+ *   • First run pops the Google authorization prompt — Allow it (this grants the
+ *     mail-sending permission, which the form-setup code never needed).
+ *   • Get the test email → mail works; any "no email" problem is the TRIGGER
+ *     (check Triggers ⏰ and the Executions log). Don't get it → check the
+ *     Executions log for the error (usually authorization or send quota).
+ */
+function sendTestEmail() {
+  var rows = [
+    { label: "Full Name", value: "Test Lead" },
+    { label: "WhatsApp Number", value: "+919876543210" },
+    { label: "Email", value: "test@example.com" },
+    { label: "Requirement Type", value: "Residential Buy" },
+    { label: "Additional Details", value: "This is a test of the enquiry notifier." },
+  ];
+  var submittedAt = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss");
+  MailApp.sendEmail(NOTIFY_TO, "New property enquiry — Test Lead (TEST)", plainText(rows, submittedAt), {
+    htmlBody: renderEmail({ rows: rows, name: "Test Lead", phone: "+919876543210", email: "test@example.com", submittedAt: submittedAt }),
+    name: BRAND.name + " Website",
+  });
+  Logger.log("Test email sent to " + NOTIFY_TO + " — check your inbox (and Spam).");
+}
+
+/**
  * Form-bound "On form submit": the event carries a FormResponse. Read each
  * answered question's title + value (only answered items are present).
  */
