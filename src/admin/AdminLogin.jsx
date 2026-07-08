@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { signIn } from "../firebase/auth";
 import { isConfigured } from "../firebase/config";
+import { isValidEmail } from "../utils/validators";
 import { useAuth } from "./useAuth";
 
 // Turn a Firebase auth error code into a friendly message.
@@ -40,7 +41,7 @@ export default function AdminLogin() {
     const errs = {};
     const mail = email.trim();
     if (!mail) errs.email = "Please enter your email.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) errs.email = "Enter a valid email address.";
+    else if (!isValidEmail(mail)) errs.email = "Enter a valid email address.";
     if (!password) errs.password = "Please enter your password.";
     return errs;
   };

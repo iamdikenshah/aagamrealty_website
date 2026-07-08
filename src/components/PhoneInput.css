@@ -1,0 +1,29 @@
+/* Shared structure + behaviour for the +91-prefixed phone control. The per-form
+   "skin" (border, height, colours, focus/invalid ring) lives with each design
+   system as .prop-phone / .enq-phone / .admin-phone so the control matches the
+   inputs around it. */
+.phone-input {
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+.phone-input__cc {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  user-select: none;
+}
+/* Neutralise the host form's input chrome — the wrapper draws the border so the
+   prefix box and the digits read as one control. */
+.phone-input__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.phone-input__field:focus {
+  box-shadow: none !important;
+}

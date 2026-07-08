@@ -1037,6 +1037,23 @@ section { padding: 72px 0; }
    Groups nested inside a .form-row are spaced by the row itself. */
 .enquiry-form > .form-group { margin-bottom: 20px; }
 
+/* Phone field skin (main site enquiry) — mirrors .form-group input; shared
+   structure lives in PhoneInput.css. */
+.enq-phone {
+  min-height: 48px;
+  border: 1.5px solid #E2E0EC; border-radius: var(--radius-sm);
+  background: var(--white);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.enq-phone:focus-within { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.2); }
+.enq-phone.is-invalid { border-color: #e11d48; box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.12); }
+.enq-phone .phone-input__cc {
+  padding: 0 12px; font-size: 15px; font-weight: 600; color: var(--charcoal);
+  background: #F3F2F8; border-right: 1.5px solid #E2E0EC;
+}
+.enq-phone .phone-input__field { padding: 13px 14px; font-size: 15px; }
+.enq-phone .phone-input__field::placeholder { color: #9a97a8; }
+
 /* Location multi-select dropdown */
 .group-label {
   display: block;

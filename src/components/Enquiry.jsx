@@ -1,5 +1,7 @@
 import { useState } from "react";
 import LocationMultiSelect from "./LocationMultiSelect";
+import PhoneInput from "./PhoneInput";
+import { isValidEmail, isValidPhone, toE164Phone } from "../utils/validators";
 import {
   GOOGLE_FORM,
   segmentOptions,
@@ -86,24 +88,15 @@ function getFieldError(name, values, locations) {
     case "whatsapp": {
       const raw = values.whatsapp.trim();
       if (!raw) return "Please enter your WhatsApp number.";
-      // Only digits, spaces, +, - are allowed.
-      if (!/^[0-9+\s-]+$/.test(raw))
-        return "Please enter a valid mobile number (digits only).";
-      const digits = raw.replace(/\D/g, "");
-      // Allow an optional 91 country code in front of a 10-digit number.
-      const national = digits.startsWith("91") && digits.length > 10
-        ? digits.slice(2)
-        : digits;
-      if (national.length !== 10)
-        return "Please enter a valid 10-digit mobile number.";
+      // Field holds only the 10 national digits (+91 is fixed in the UI).
+      if (!isValidPhone(raw)) return "Please enter a valid 10-digit mobile number.";
       return "";
     }
 
     case "email": {
       const raw = values.email.trim();
       if (!raw) return ""; // optional
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw))
-        return "Please enter a valid email address.";
+      if (!isValidEmail(raw)) return "Please enter a valid email address.";
       return "";
     }
 
@@ -270,9 +263,11 @@ export default function EnquiryForm() {
     // Build the payload mapped to Google Form entry IDs — each field posts to
     // its own column. Conditionally-hidden fields are omitted so they land blank.
     const f = GOOGLE_FORM.fields;
+    // The field holds only the 10 national digits; +91 is fixed in the UI.
+    const fullPhone = toE164Phone(values.whatsapp);
     const data = new FormData();
     data.append(f.fullName, values.fullName);
-    data.append(f.whatsapp, values.whatsapp);
+    data.append(f.whatsapp, fullPhone);
     // Combine segment + requirement into one value, e.g. "Commercial Buy".
     data.append(f.requirement, [values.segment, values.requirement].filter(Boolean).join(" "));
     if (values.email.trim()) data.append(f.email, values.email.trim());
@@ -299,7 +294,7 @@ export default function EnquiryForm() {
         .then(({ addEnquiry }) =>
           addEnquiry({
             name: values.fullName.trim(),
-            phone: values.whatsapp.trim(),
+            phone: fullPhone,
             email: values.email.trim(),
             message: buildEnquiryMessage(values, locations),
             propertyId: null,
@@ -404,17 +399,14 @@ export default function EnquiryForm() {
               <label htmlFor="whatsapp">
                 WhatsApp Number <span aria-hidden="true">*</span>
               </label>
-              <input
-                type="tel"
+              <PhoneInput
+                variant="site"
                 id="whatsapp"
                 name="whatsapp"
-                placeholder="e.g. 98765 43210"
-                inputMode="numeric"
-                autoComplete="tel"
-                className={cls("whatsapp")}
-                aria-invalid={!!errors.whatsapp}
                 value={values.whatsapp}
-                onChange={(e) => setField("whatsapp", e.target.value)}
+                onChange={(digits) => setField("whatsapp", digits)}
+                invalid={!!errors.whatsapp}
+                placeholder="98765 43210"
               />
               <FieldError name="whatsapp" />
             </div>

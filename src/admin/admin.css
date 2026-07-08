@@ -275,6 +275,20 @@
 .admin-field input:focus, .admin-field select:focus, .admin-field textarea:focus {
   outline: none; border-color: var(--purple); box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.1);
 }
+/* Phone field skin (admin forms) — mirrors .admin-field input; shared structure
+   lives in PhoneInput.css. */
+.admin-phone {
+  border: 1px solid #d3dae8; border-radius: var(--radius-sm);
+  background: var(--white); transition: border-color 0.15s, box-shadow 0.15s;
+}
+.admin-phone:focus-within { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.1); }
+.admin-phone.is-invalid { border-color: #c0392b; }
+.admin-phone .phone-input__cc {
+  padding: 0 11px; font-size: 0.9rem; font-weight: 600; color: var(--charcoal);
+  background: #f2f5fa; border-right: 1px solid #d3dae8;
+}
+.admin-phone .phone-input__field { padding: 9px 11px; font-size: 0.9rem; }
+
 .admin-checkline { display: flex; align-items: center; gap: 8px; font-weight: 400; }
 .admin-checkline input { width: auto; }
 .admin-inline-row { display: flex; gap: 8px; align-items: center; }

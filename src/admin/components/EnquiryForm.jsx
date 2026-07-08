@@ -1,6 +1,8 @@
 import { useState } from "react";
 import AdminSelect from "./AdminSelect";
 import LocationMultiSelect from "../../components/LocationMultiSelect";
+import PhoneInput from "../../components/PhoneInput";
+import { isValidEmail, isValidPhone, toE164Phone } from "../../utils/validators";
 import {
   segmentOptions,
   requirementOptions,
@@ -92,15 +94,13 @@ function fieldError(name, v, locations) {
     case "whatsapp": {
       const raw = v.whatsapp.trim();
       if (!raw) return "Phone is required.";
-      if (!/^[0-9+\s-]+$/.test(raw)) return "Digits only.";
-      const digits = raw.replace(/\D/g, "");
-      const national = digits.startsWith("91") && digits.length > 10 ? digits.slice(2) : digits;
-      if (national.length !== 10) return "Enter a valid 10-digit number.";
+      // Field holds only the 10 national digits (+91 is fixed in the UI).
+      if (!isValidPhone(raw)) return "Enter a valid 10-digit number.";
       return "";
     }
     case "email":
       if (!v.email.trim()) return "";
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim()) ? "" : "Enter a valid email.";
+      return isValidEmail(v.email) ? "" : "Enter a valid email.";
     case "requirement": return v.requirement ? "" : "Select a requirement type.";
     case "propertyCategory": return v.propertyCategory ? "" : "Select a category.";
     case "configuration":
@@ -219,7 +219,7 @@ export default function EnquiryForm({ properties = [], saving, onSubmit, onCance
     const followUpAt = values.followUpAt ? new Date(`${values.followUpAt}T09:00:00`) : null;
     onSubmit({
       name: values.fullName,
-      phone: values.whatsapp,
+      phone: toE164Phone(values.whatsapp),
       email: values.email,
       message: buildMessage(values, locations),
       budget: values.budget,
@@ -241,8 +241,8 @@ export default function EnquiryForm({ properties = [], saving, onSubmit, onCance
               autoComplete="off" placeholder="e.g. Rohan Mehta" />
           </Field>
           <Field label="WhatsApp *" error={errors.whatsapp}>
-            <input type="tel" inputMode="numeric" value={values.whatsapp} onChange={(e) => set("whatsapp", e.target.value)}
-              autoComplete="off" placeholder="e.g. 98765 43210" />
+            <PhoneInput variant="admin" value={values.whatsapp} onChange={(digits) => set("whatsapp", digits)}
+              invalid={!!errors.whatsapp} placeholder="98765 43210" autoComplete="off" />
           </Field>
           <Field label="Email" error={errors.email} hint="Optional — for brochures & shortlists.">
             <input type="email" value={values.email} onChange={(e) => set("email", e.target.value)}

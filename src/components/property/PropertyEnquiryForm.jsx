@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { GOOGLE_FORM, whatsappLink } from "../../data/content";
 import { CATEGORY_LABELS, TRANSACTION_LABELS } from "../../data/properties";
 import { track } from "../../analytics";
+import PhoneInput from "../PhoneInput";
+import { isValidEmail, isValidPhone, toE164Phone } from "../../utils/validators";
 
 const EMPTY = { name: "", phone: "", email: "", message: "" };
 
@@ -48,13 +50,19 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  // Phone is a controlled digits-only value (PhoneInput sanitizes + caps at 10).
+  const setPhone = (digits) => {
+    setValues((v) => ({ ...v, phone: digits }));
+    if (errors.phone) setErrors((prev) => ({ ...prev, phone: "" }));
+  };
+
   const validate = () => {
     const next = {};
     if (!values.name.trim()) next.name = "Please enter your name.";
     const phone = values.phone.trim();
     if (!phone) next.phone = "Please enter your phone number.";
-    else if (!/^[0-9+\s-]{7,15}$/.test(phone)) next.phone = "Enter a valid phone number.";
-    if (values.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim()))
+    else if (!isValidPhone(phone)) next.phone = "Enter a valid 10-digit phone number.";
+    if (values.email.trim() && !isValidEmail(values.email))
       next.email = "Enter a valid email address.";
     return next;
   };
@@ -67,9 +75,12 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
 
     // Map onto the shared Google Form entry IDs — same sheet as the main enquiry.
     const f = GOOGLE_FORM.fields;
+    // Store/submit the full E.164-style number; the field only holds the 10
+    // national digits, +91 is fixed in the UI.
+    const fullPhone = toE164Phone(values.phone);
     const data = new FormData();
     data.append(f.fullName, values.name.trim());
-    data.append(f.whatsapp, values.phone.trim());
+    data.append(f.whatsapp, fullPhone);
     if (values.email.trim()) data.append(f.email, values.email.trim());
     const category = CATEGORY_LABELS[property.category] || "";
     const transaction = TRANSACTION_LABELS[property.transaction] || "";
@@ -92,7 +103,7 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
         .then(({ addEnquiry }) =>
           addEnquiry({
             name: values.name.trim(),
-            phone: values.phone.trim(),
+            phone: fullPhone,
             email: values.email.trim(),
             message: values.message.trim(),
             propertyId: property.id,
@@ -141,8 +152,8 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
 
       <label className="prop-field">
         <span>Phone<em>*</em></span>
-        <input name="phone" type="tel" value={values.phone} onChange={update}
-          aria-invalid={!!errors.phone} autoComplete="tel" placeholder="+91 " />
+        <PhoneInput variant="prop" value={values.phone} onChange={setPhone}
+          invalid={!!errors.phone} placeholder="Mobile number" />
         {errors.phone && <small className="prop-field__err">{errors.phone}</small>}
       </label>
 

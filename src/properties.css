@@ -569,6 +569,19 @@
 .prop-field input[aria-invalid="true"], .prop-field textarea[aria-invalid="true"] { border-color: #d33; }
 .prop-field textarea { resize: vertical; line-height: 1.5; }
 .prop-field__err { display: block; color: #d33; font-size: 13px; margin-top: 5px; }
+
+/* Phone field skin (property form) — see PhoneInput.css for shared structure. */
+.prop-phone {
+  border: 1.5px solid var(--light-gray); border-radius: var(--radius-sm);
+  background: var(--white); transition: border-color 0.2s ease;
+}
+.prop-phone:focus-within { border-color: var(--purple); }
+.prop-phone.is-invalid { border-color: #d33; }
+.prop-phone .phone-input__cc {
+  padding: 0 10px 0 14px; font-size: 15px; font-weight: 600; color: var(--charcoal);
+  background: #f4f4f6; border-right: 1.5px solid var(--light-gray);
+}
+.prop-phone .phone-input__field { padding: 12px 14px; font-size: 15px; }
 .prop-enquiry__submit { width: 100%; margin-top: 4px; }
 .prop-enquiry__wa {
   width: 100%;
