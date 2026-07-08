@@ -6,7 +6,7 @@
   "homepage": "https://aagamrealty.com/",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender-routes.js",
     "preview": "vite preview"
   },
   "dependencies": {
