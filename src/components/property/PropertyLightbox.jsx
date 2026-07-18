@@ -57,20 +57,15 @@ export default function PropertyLightbox({ gallery, title, startIndex = 0, onClo
   const active = items[current] || items[0];
   const activeCat = active?.cat;
 
-  // Global indices of the images in the currently-active category, in order.
-  const catIndices = useMemo(
-    () => items.map((g, i) => (g.cat === activeCat ? i : -1)).filter((i) => i >= 0),
-    [items, activeCat]
-  );
-  const posInCat = catIndices.indexOf(current);
-
+  // Prev/next run through the whole gallery, not just the active category.
+  // Because `items` is sorted into category runs, reaching the end of Outdoor
+  // simply continues into the next category — and the tab highlight follows,
+  // since `activeCat` is derived from the current image.
   const go = useCallback(
     (dir) => {
-      if (!catIndices.length) return;
-      const next = (posInCat + dir + catIndices.length) % catIndices.length;
-      setCurrent(catIndices[next]);
+      setCurrent((c) => (c + dir + items.length) % items.length);
     },
-    [catIndices, posInCat]
+    [items.length]
   );
 
   const selectCategory = (name) => {
@@ -128,7 +123,7 @@ export default function PropertyLightbox({ gallery, title, startIndex = 0, onClo
       )}
 
       <div className="prop-lightbox__stage">
-        {catIndices.length > 1 && (
+        {items.length > 1 && (
           <button
             type="button"
             className="prop-lightbox__nav prop-lightbox__nav--prev"
@@ -149,7 +144,7 @@ export default function PropertyLightbox({ gallery, title, startIndex = 0, onClo
           {active.caption && <figcaption className="prop-lightbox__caption">{active.caption}</figcaption>}
         </figure>
 
-        {catIndices.length > 1 && (
+        {items.length > 1 && (
           <button
             type="button"
             className="prop-lightbox__nav prop-lightbox__nav--next"
