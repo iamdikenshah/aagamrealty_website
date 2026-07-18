@@ -746,14 +746,13 @@
 .prop-share__btn.is-copied { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--white); }
 .prop-share__copied { font-size: 13px; color: var(--whatsapp); font-weight: 600; }
 
-/* Gallery groups — in the "All" view each category gets its own labelled block. */
-.prop-gallery__group + .prop-gallery__group { margin-top: 28px; }
-.prop-gallery__group-title {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 16px; font-weight: 600; color: var(--charcoal);
-  margin: 0 0 14px;
+
+/* Category cover tile — stands in for a whole category in the "All" view. */
+.prop-gallery__count {
+  position: absolute; top: 10px; right: 10px;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 999px;
+  background: rgba(15, 20, 30, 0.72); color: var(--white);
+  font-size: 13px; font-weight: 600; backdrop-filter: blur(2px);
 }
-.prop-gallery__group-count {
-  font-size: 12px; font-weight: 600; color: var(--gray);
-  background: var(--light-gray); border-radius: 999px; padding: 2px 9px;
-}
+.prop-gallery__item--cover .prop-gallery__cap { font-weight: 600; font-size: 15px; }

@@ -490,19 +490,27 @@ function Gallery({ images = [], title, onOpen }) {
 
 const UNCATEGORISED = "Other";
 
-function GalleryTile({ g, onOpen }) {
+function GalleryTile({ g, onOpen, label, count }) {
+  // `count` marks a category cover in the "All" view: one tile standing in for
+  // the whole category, rather than a single photo.
+  const isCover = count != null;
   return (
     <button
       type="button"
-      className="prop-gallery__item"
+      className={`prop-gallery__item${isCover ? " prop-gallery__item--cover" : ""}`}
       onClick={() => onOpen?.(g.index)}
-      aria-label={`View ${g.caption || g.cat}`}
+      aria-label={isCover ? `View all ${count} ${label} photos` : `View ${g.caption || g.cat}`}
     >
       <SmartImage src={g.url} alt={g.caption || g.cat} />
       <span className="prop-gallery__zoom" aria-hidden="true"><i className="fa-solid fa-magnifying-glass-plus" /></span>
+      {isCover && (
+        <span className="prop-gallery__count" aria-hidden="true">
+          <i className="fa-regular fa-images" /> {count}
+        </span>
+      )}
       {/* Skip the caption bar entirely when there is no text for it. */}
-      {(g.caption || g.category) && (
-        <span className="prop-gallery__cap">{g.caption || g.category}</span>
+      {(label || g.caption || g.category) && (
+        <span className="prop-gallery__cap">{label || g.caption || g.category}</span>
       )}
     </button>
   );
@@ -523,16 +531,21 @@ function CategoryGallery({ gallery, onOpen }) {
   // "All" rather than showing an empty grid.
   const activeCat = cat === "All" || categories.includes(cat) ? cat : "All";
 
-  // "All" shows every category as its own labelled group; a specific tab shows
-  // just that one, ungrouped (the tab already names it).
-  const groups =
-    activeCat === "All"
-      ? categories.map((name) => ({ name, images: items.filter((g) => g.cat === name) }))
-      : [{ name: null, images: items.filter((g) => g.cat === activeCat) }];
+  // "All" is a category index — one cover tile per category showing how many
+  // photos it holds. Picking a tab then shows that category's photos in full.
+  const covers = useMemo(
+    () =>
+      categories.map((name) => {
+        const images = items.filter((g) => g.cat === name);
+        return { name, cover: images[0], count: images.length };
+      }),
+    [categories, items]
+  );
+  const shown = items.filter((g) => g.cat === activeCat);
 
   return (
     <div>
-      {/* One category and no groups to label — nothing to filter, hide the row. */}
+      {/* One category means nothing to filter and nothing to index — hide both. */}
       {categories.length > 1 && (
         <div className="prop-gallery__tabs">
           {["All", ...categories].map((c) => (
@@ -543,22 +556,21 @@ function CategoryGallery({ gallery, onOpen }) {
         </div>
       )}
 
-      {groups.map((group) => (
-        <section className="prop-gallery__group" key={group.name || "single"}>
-          {/* Headings only make sense when several groups are stacked. */}
-          {group.name && groups.length > 1 && (
-            <h3 className="prop-gallery__group-title">
-              {group.name}
-              <span className="prop-gallery__group-count">{group.images.length}</span>
-            </h3>
-          )}
-          <div className="prop-gallery__grid">
-            {group.images.map((g) => (
+      <div className="prop-gallery__grid">
+        {activeCat === "All" && categories.length > 1
+          ? covers.map((c) => (
+              <GalleryTile
+                key={c.name}
+                g={c.cover}
+                label={c.name}
+                count={c.count}
+                onOpen={onOpen}
+              />
+            ))
+          : (activeCat === "All" ? items : shown).map((g) => (
               <GalleryTile key={`${g.url}-${g.index}`} g={g} onOpen={onOpen} />
             ))}
-          </div>
-        </section>
-      ))}
+      </div>
     </div>
   );
 }
