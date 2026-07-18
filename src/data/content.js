@@ -209,6 +209,18 @@ export const WHATSAPP_NUMBER = "919227100299";
 /** E.164 number for `tel:` links. Same line as WhatsApp. */
 export const CONTACT_PHONE = "+919227100299";
 
+/** Canonical origin — used when there's no browser origin to read (SSR/prerender). */
+export const SITE_URL = "https://aagamrealty.com";
+
+/**
+ * Absolute, shareable URL for a listing. Prefers the live origin so links
+ * copied on localhost or a preview deploy stay on that host.
+ */
+export const propertyUrl = (id) => {
+  const origin = typeof window !== "undefined" && window.location?.origin ? window.location.origin : SITE_URL;
+  return `${origin}/property/${encodeURIComponent(id)}`;
+};
+
 /** Build a wa.me deep-link that pre-fills the chat with `text`. */
 export const whatsappLink = (text) =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;

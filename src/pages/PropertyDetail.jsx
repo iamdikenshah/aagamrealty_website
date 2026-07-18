@@ -3,6 +3,7 @@ import { Link, navigate } from "../router.jsx";
 import PropertyEnquiryForm from "../components/property/PropertyEnquiryForm";
 import PropertyLightbox from "../components/property/PropertyLightbox";
 import BrochureModal from "../components/property/BrochureModal";
+import PropertyShare from "../components/property/PropertyShare";
 import SmartImage from "../components/SmartImage.jsx";
 import { track } from "../analytics";
 import { whatsappLink, CONTACT_PHONE } from "../data/content";
@@ -140,6 +141,7 @@ export default function PropertyDetail({ id, previewData, preview = false }) {
               {property.locality}, {property.city}
               {property.developer && <span className="prop-detail__dev"> · {property.developer}</span>}
             </p>
+            <PropertyShare property={property} preview={preview} />
           </div>
           <div className="prop-detail__price">
             <span className="prop-detail__price-label">

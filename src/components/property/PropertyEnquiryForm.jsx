@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GOOGLE_FORM, whatsappLink } from "../../data/content";
+import { GOOGLE_FORM, whatsappLink, propertyUrl } from "../../data/content";
 import { CATEGORY_LABELS, TRANSACTION_LABELS } from "../../data/properties";
 import { track } from "../../analytics";
 import PhoneInput from "../PhoneInput";
@@ -50,7 +50,7 @@ export default function PropertyEnquiryForm({
 
   // Live WhatsApp link — always reflects the current Message box text.
   const waHref = whatsappLink(
-    values.message.trim() || `I'm interested in ${property.title} (${property.locality}).`
+    `${values.message.trim() || `I'm interested in ${property.title} (${property.locality}).`}\n\n${propertyUrl(property.id)}`
   );
 
   const update = (e) => {
@@ -89,6 +89,7 @@ export default function PropertyEnquiryForm({
     // Store/submit the full E.164-style number; the field only holds the 10
     // national digits, +91 is fixed in the UI.
     const fullPhone = toE164Phone(values.phone);
+    const detailsWithLink = `${values.message.trim()}\n\nProperty: ${property.title}\n${propertyUrl(property.id)}`;
     const data = new FormData();
     data.append(f.fullName, values.name.trim());
     data.append(f.whatsapp, fullPhone);
@@ -99,8 +100,12 @@ export default function PropertyEnquiryForm({
     if (property.propertyType) data.append(f.propertyCategory, property.propertyType);
     if (prefillConfig) data.append(f.configuration, prefillConfig);
     data.append(GOOGLE_FORM.locationEntry, property.locality);
-    // Carry the full message (incl. the property reference) into the details cell.
-    data.append(GOOGLE_FORM.detailsEntry, values.message.trim());
+    // Carry the full message (incl. the property reference) into the details
+    // cell, with the listing URL appended so whoever picks the lead up can open
+    // the exact property without searching for it. Appended at submit time
+    // rather than seeded into the textarea, so the visitor can't delete it and
+    // it never appears twice.
+    data.append(GOOGLE_FORM.detailsEntry, detailsWithLink);
     data.append(f.consent, "Yes");
 
     setSubmitting(true);
@@ -116,7 +121,7 @@ export default function PropertyEnquiryForm({
             name: values.name.trim(),
             phone: fullPhone,
             email: values.email.trim(),
-            message: values.message.trim(),
+            message: detailsWithLink,
             propertyId: property.id,
           })
         )
