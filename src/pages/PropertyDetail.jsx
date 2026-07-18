@@ -6,7 +6,7 @@ import BrochureModal from "../components/property/BrochureModal";
 import PropertyShare from "../components/property/PropertyShare";
 import SmartImage from "../components/SmartImage.jsx";
 import { track } from "../analytics";
-import { whatsappLink, CONTACT_PHONE } from "../data/content";
+import { whatsappLink, CONTACT_PHONE, propertyUrl } from "../data/content";
 import {
   getPropertyById,
   LISTING_TYPE_LABELS,
@@ -193,7 +193,7 @@ export default function PropertyDetail({ id, previewData, preview = false }) {
                         <a
                           className="btn btn-outline prop-config__cta prop-config__cta--wa"
                           href={whatsappLink(
-                            `Hi Aagam Realty, I'm interested in the ${c.config} at ${property.title} (${property.locality}). Please share more details.`
+                            `Hi Aagam Realty, I'm interested in the ${c.config} at ${property.title} (${property.locality}). Please share more details.\n\n${propertyUrl(property.id)}`
                           )}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -488,52 +488,77 @@ function Gallery({ images = [], title, onOpen }) {
   );
 }
 
+const UNCATEGORISED = "Other";
+
+function GalleryTile({ g, onOpen }) {
+  return (
+    <button
+      type="button"
+      className="prop-gallery__item"
+      onClick={() => onOpen?.(g.index)}
+      aria-label={`View ${g.caption || g.cat}`}
+    >
+      <SmartImage src={g.url} alt={g.caption || g.cat} />
+      <span className="prop-gallery__zoom" aria-hidden="true"><i className="fa-solid fa-magnifying-glass-plus" /></span>
+      {/* Skip the caption bar entirely when there is no text for it. */}
+      {(g.caption || g.category) && (
+        <span className="prop-gallery__cap">{g.caption || g.category}</span>
+      )}
+    </button>
+  );
+}
+
 function CategoryGallery({ gallery, onOpen }) {
-  // Uncategorised images are common (the category field is optional), so drop
-  // blanks — otherwise `undefined` becomes an empty, unclickable tab pill.
-  const categories = useMemo(
-    () => ["All", ...new Set(gallery.map((g) => g.category?.trim()).filter(Boolean))],
+  // The category field is optional; bucket the blanks rather than letting
+  // `undefined` become an empty, unclickable tab pill. Same fallback label the
+  // lightbox uses, so the two views agree.
+  const items = useMemo(
+    () => gallery.map((g, index) => ({ ...g, index, cat: g.category?.trim() || UNCATEGORISED })),
     [gallery]
   );
+  const categories = useMemo(() => [...new Set(items.map((g) => g.cat))], [items]);
+
   const [cat, setCat] = useState("All");
   // The selected category can disappear (images edited/removed) — fall back to
   // "All" rather than showing an empty grid.
-  const activeCat = categories.includes(cat) ? cat : "All";
-  // Keep original global indices so a click opens the lightbox at the right image.
-  const shown = gallery
-    .map((g, index) => ({ ...g, index }))
-    .filter((g) => activeCat === "All" || g.category === activeCat);
+  const activeCat = cat === "All" || categories.includes(cat) ? cat : "All";
+
+  // "All" shows every category as its own labelled group; a specific tab shows
+  // just that one, ungrouped (the tab already names it).
+  const groups =
+    activeCat === "All"
+      ? categories.map((name) => ({ name, images: items.filter((g) => g.cat === name) }))
+      : [{ name: null, images: items.filter((g) => g.cat === activeCat) }];
 
   return (
     <div>
-      {/* With nothing but "All" there is nothing to filter — hide the row. */}
+      {/* One category and no groups to label — nothing to filter, hide the row. */}
       {categories.length > 1 && (
         <div className="prop-gallery__tabs">
-          {categories.map((c) => (
+          {["All", ...categories].map((c) => (
             <button key={c} type="button" className={`prop-tab${c === activeCat ? " active" : ""}`} onClick={() => setCat(c)}>
               {c}
             </button>
           ))}
         </div>
       )}
-      <div className="prop-gallery__grid">
-        {shown.map((g) => (
-          <button
-            type="button"
-            className="prop-gallery__item"
-            key={`${g.url}-${g.index}`}
-            onClick={() => onOpen?.(g.index)}
-            aria-label={`View ${g.caption || g.category || `image ${g.index + 1}`}`}
-          >
-            <SmartImage src={g.url} alt={g.caption || g.category || ""} />
-            <span className="prop-gallery__zoom" aria-hidden="true"><i className="fa-solid fa-magnifying-glass-plus" /></span>
-            {/* Skip the caption bar entirely when there is no text for it. */}
-            {(g.caption || g.category) && (
-              <span className="prop-gallery__cap">{g.caption || g.category}</span>
-            )}
-          </button>
-        ))}
-      </div>
+
+      {groups.map((group) => (
+        <section className="prop-gallery__group" key={group.name || "single"}>
+          {/* Headings only make sense when several groups are stacked. */}
+          {group.name && groups.length > 1 && (
+            <h3 className="prop-gallery__group-title">
+              {group.name}
+              <span className="prop-gallery__group-count">{group.images.length}</span>
+            </h3>
+          )}
+          <div className="prop-gallery__grid">
+            {group.images.map((g) => (
+              <GalleryTile key={`${g.url}-${g.index}`} g={g} onOpen={onOpen} />
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   );
 }

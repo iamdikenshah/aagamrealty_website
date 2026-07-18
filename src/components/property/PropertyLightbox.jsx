@@ -14,17 +14,38 @@ import SmartImage from "../SmartImage.jsx";
  * @param {() => void} props.onClose
  */
 export default function PropertyLightbox({ gallery, title, startIndex = 0, onClose }) {
-  const [current, setCurrent] = useState(startIndex);
   const activeThumbRef = useRef(null);
 
   // The category field is optional, but this view *groups and navigates* by it —
   // so uncategorised images need a real bucket rather than an `undefined` key,
   // which would render as an empty, unlabelled tab.
   const UNCATEGORISED = "Other";
-  const items = useMemo(
-    () => gallery.map((g) => ({ ...g, cat: g.category?.trim() || UNCATEGORISED })),
-    [gallery]
-  );
+
+  // Reorder so every category's images sit together. The stored gallery order is
+  // upload order, which interleaves categories — leaving prev/next to jump
+  // across the strip and the thumbnails to read as noise. Sorting by first
+  // appearance keeps the tab order the visitor sees while making each category
+  // one contiguous run. `origIndex` maps back to the caller's indexing.
+  const items = useMemo(() => {
+    const withCat = gallery.map((g, origIndex) => ({
+      ...g,
+      origIndex,
+      cat: g.category?.trim() || UNCATEGORISED,
+    }));
+    const order = [];
+    withCat.forEach((g) => { if (!order.includes(g.cat)) order.push(g.cat); });
+    // Stable within a category: ties fall back to the original position.
+    return withCat
+      .map((g, i) => ({ g, i }))
+      .sort((a, b) => order.indexOf(a.g.cat) - order.indexOf(b.g.cat) || a.i - b.i)
+      .map(({ g }) => g);
+  }, [gallery]);
+
+  // `startIndex` refers to the *unsorted* gallery, so translate it once.
+  const [current, setCurrent] = useState(() => {
+    const at = items.findIndex((g) => g.origIndex === startIndex);
+    return at >= 0 ? at : 0;
+  });
 
   // Ordered, de-duplicated list of categories with per-category counts.
   const categories = useMemo(() => {

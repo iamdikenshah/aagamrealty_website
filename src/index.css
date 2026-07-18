@@ -15,7 +15,8 @@
   --light-gray: #EDF1F8;
   --gold: #FFB300;
   --gold-2: #C9963C; /* secondary antique gold — premium accents */
-  --whatsapp: #25D366;
+  --whatsapp: #25D366;        /* official WhatsApp brand green */
+  --whatsapp-dark: #1EBE5B;   /* hover/pressed shade — never used as a base */
   --shadow-sm: 0 2px 8px rgba(26, 26, 46, 0.06);
   --shadow-md: 0 8px 24px rgba(26, 26, 46, 0.10);
   --shadow-lg: 0 16px 40px rgba(27, 42, 74, 0.28);

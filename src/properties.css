@@ -328,8 +328,8 @@
   font-size: 18px; line-height: 1; text-decoration: none;
 }
 .prop-config__cta i { margin: 0; }
-.prop-config__cta--wa { color: #128c7e; border-color: #128c7e; }
-.prop-config__cta--wa:hover { background: #128c7e; color: var(--white); }
+.prop-config__cta--wa { color: var(--whatsapp); border-color: var(--whatsapp); }
+.prop-config__cta--wa:hover { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--white); }
 
 /* Tables */
 .prop-table-scroll { overflow-x: auto; }
@@ -602,8 +602,8 @@
 }
 .prop-enquiry__wa i { font-size: 18px; }
 .prop-enquiry__wa:hover {
-  background: #1ebe5b;
-  border-color: #1ebe5b;
+  background: var(--whatsapp-dark);
+  border-color: var(--whatsapp-dark);
   color: var(--white);
   box-shadow: 0 10px 24px rgba(37, 211, 102, 0.35);
 }
@@ -745,3 +745,15 @@
 .prop-share__btn--wa:hover { background: var(--whatsapp); border-color: var(--whatsapp); }
 .prop-share__btn.is-copied { background: var(--whatsapp); border-color: var(--whatsapp); color: var(--white); }
 .prop-share__copied { font-size: 13px; color: var(--whatsapp); font-weight: 600; }
+
+/* Gallery groups — in the "All" view each category gets its own labelled block. */
+.prop-gallery__group + .prop-gallery__group { margin-top: 28px; }
+.prop-gallery__group-title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 16px; font-weight: 600; color: var(--charcoal);
+  margin: 0 0 14px;
+}
+.prop-gallery__group-count {
+  font-size: 12px; font-weight: 600; color: var(--gray);
+  background: var(--light-gray); border-radius: 999px; padding: 2px 9px;
+}
