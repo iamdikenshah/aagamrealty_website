@@ -719,4 +719,10 @@
 }
 .prop-brochure__close:hover { background: rgba(15, 20, 30, 0.14); }
 
-.prop-brochure__dl { margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; }
+/* Matches .prop-enquiry__wa so both buttons in the done state line up. */
+.prop-brochure__dl {
+  width: 100%; margin-top: 10px; min-height: 48px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.prop-brochure__dl i { font-size: 18px; }
+.prop-brochure__dl:disabled { opacity: 0.6; cursor: wait; }

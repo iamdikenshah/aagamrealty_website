@@ -12,6 +12,7 @@ import { track } from "../../analytics";
  */
 export default function BrochureModal({ property, onClose, preview = false }) {
   const [unlocked, setUnlocked] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const closeRef = useRef(null);
   const brochure = property.brochure;
 
@@ -29,19 +30,41 @@ export default function BrochureModal({ property, onClose, preview = false }) {
 
   const fileName = brochure?.name || `${property.title} brochure.pdf`;
 
-  // Kick off the download. `download` only forces a save for same-origin URLs;
-  // Firebase Storage is cross-origin, so the browser may open the PDF in a new
-  // tab instead. Either way the visitor gets the file.
-  const startDownload = () => {
-    if (!brochure?.url) return;
-    const a = document.createElement("a");
-    a.href = brochure.url;
-    a.download = fileName;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+  /**
+   * Save the PDF to the visitor's device.
+   *
+   * The `download` attribute is ignored for cross-origin URLs, so linking
+   * straight at Firebase Storage navigates/opens a tab instead of downloading.
+   * Fetching the file into a blob makes it same-origin from the browser's point
+   * of view, so `download` is honoured.
+   *
+   * This needs CORS on the Storage bucket for this site's origin; if that isn't
+   * configured the fetch throws and we fall back to opening the file, which is
+   * the old behaviour rather than a dead end.
+   */
+  const startDownload = async () => {
+    if (!brochure?.url || downloading) return;
+    setDownloading(true);
+    let objectUrl;
+    try {
+      const res = await fetch(brochure.url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      console.error("[brochure] direct download failed, opening instead", err);
+      window.open(brochure.url, "_blank", "noopener,noreferrer");
+    } finally {
+      // Revoking immediately can cancel the save in some browsers.
+      if (objectUrl) setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
+      setDownloading(false);
+    }
   };
 
   const onUnlocked = () => {
@@ -79,17 +102,17 @@ export default function BrochureModal({ property, onClose, preview = false }) {
             body: (
               <>
                 <p>
-                  If it didn&apos;t start automatically, use the link below.
+                  If it didn&apos;t start automatically, use the button below.
                 </p>
-                <a
+                <button
+                  type="button"
                   className="btn btn-primary prop-brochure__dl"
-                  href={brochure?.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download={fileName}
+                  onClick={startDownload}
+                  disabled={downloading}
                 >
-                  <i className="fa-solid fa-file-arrow-down" aria-hidden="true" /> Download brochure
-                </a>
+                  <i className="fa-solid fa-file-arrow-down" aria-hidden="true" />
+                  {downloading ? "Downloading…" : "Download brochure"}
+                </button>
               </>
             ),
           }}
