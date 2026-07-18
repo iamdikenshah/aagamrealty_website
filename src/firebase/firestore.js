@@ -46,6 +46,7 @@ export const LISTS = {
   localities: "localities",
   amenities: "amenities",
   keyFeatures: "keyFeatures",
+  galleryCategories: "galleryCategories",
 };
 
 // Attach the Firestore doc id as `id` (matches the old JSON records) and drop

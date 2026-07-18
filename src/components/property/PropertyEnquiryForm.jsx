@@ -13,7 +13,17 @@ const EMPTY = { name: "", phone: "", email: "", message: "" };
  * (see data/content GOOGLE_FORM), mapping the fields onto its entry IDs. The
  * "chat on WhatsApp" button carries whatever is currently in the Message box.
  */
-export default function PropertyEnquiryForm({ property, prefillConfig }) {
+export default function PropertyEnquiryForm({
+  property,
+  prefillConfig,
+  preview = false,
+  // Brochure gate: when set, the form is acting as the unlock step for a
+  // download. `onSuccess` fires once the enquiry is accepted.
+  onSuccess,
+  submitLabel,
+  intro,
+  done, // {title, body} override for the post-submit confirmation
+}) {
   // Default message — config-specific when a configuration's "Enquire Now" was
   // clicked, otherwise a generic one for the whole listing.
   const defaultMessage = (config) =>
@@ -69,6 +79,7 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (preview) return; // admin preview — never file a real enquiry
     const next = validate();
     setErrors(next);
     if (Object.keys(next).length) return;
@@ -115,8 +126,10 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
         property_id: property.id,
         property_title: property.title,
         configuration: prefillConfig || undefined,
+        intent: onSuccess ? "brochure" : undefined,
       });
       setSent(true);
+      onSuccess?.();
     } catch {
       setFailed(true);
     } finally {
@@ -128,8 +141,10 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
     return (
       <div className="prop-enquiry prop-enquiry--done" role="status">
         <div className="prop-enquiry__tick"><i className="fa-solid fa-circle-check" aria-hidden="true" /></div>
-        <h3>Thank you!</h3>
-        <p>We've received your enquiry for <strong>{property.title}</strong> and will get back to you shortly.</p>
+        <h3>{done?.title || "Thank you!"}</h3>
+        {done?.body || (
+          <p>We've received your enquiry for <strong>{property.title}</strong> and will get back to you shortly.</p>
+        )}
         <a className="btn prop-enquiry__wa" href={waHref} target="_blank" rel="noopener noreferrer"
           onClick={() => track("whatsapp_click", { location: "property_form_done", property_id: property.id })}>
           <i className="fa-brands fa-whatsapp" aria-hidden="true" /> Chat on WhatsApp
@@ -140,8 +155,8 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
 
   return (
     <form className="prop-enquiry" onSubmit={handleSubmit} noValidate>
-      <h3 className="prop-enquiry__title">Enquire about this property</h3>
-      <p className="prop-enquiry__sub">Share your details and our team will reach out.</p>
+      <h3 className="prop-enquiry__title">{intro?.title || "Enquire about this property"}</h3>
+      <p className="prop-enquiry__sub">{intro?.sub || "Share your details and our team will reach out."}</p>
 
       <label className="prop-field">
         <span>Full name<em>*</em></span>
@@ -169,8 +184,8 @@ export default function PropertyEnquiryForm({ property, prefillConfig }) {
         <textarea name="message" rows="3" value={values.message} onChange={update} />
       </label>
 
-      <button type="submit" className="btn btn-primary prop-enquiry__submit" disabled={submitting}>
-        {submitting ? "Sending…" : "Enquire Now"}
+      <button type="submit" className="btn btn-primary prop-enquiry__submit" disabled={submitting || preview}>
+        {submitting ? "Sending…" : submitLabel || "Enquire Now"}
       </button>
       <a className="btn prop-enquiry__wa" href={waHref} target="_blank" rel="noopener noreferrer"
         onClick={() => track("whatsapp_click", { location: "property_form", property_id: property.id })}>

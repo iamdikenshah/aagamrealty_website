@@ -1,9 +1,9 @@
 // =============================================================================
 // ONE-OFF — seed CMS-managed reference lists from existing data
 // =============================================================================
-// Populates the developers / localities / amenities / keyFeatures collections so
-// the admin dropdowns (and the public locality controls) have sensible values
-// from day one. NOT part of the app bundle.
+// Populates the developers / localities / amenities / keyFeatures /
+// galleryCategories collections so the admin dropdowns (and the public locality
+// controls) have sensible values from day one. NOT part of the app bundle.
 //
 // Usage (key path defaults to ./serviceAccountKey.json):
 //   node scripts/seed-reference-lists.js
@@ -22,6 +22,19 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = resolve(__dirname, "../src/data/properties.json");
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const uniqSorted = (arr) => [...new Set(arr.filter((s) => s && s.trim()))].sort((a, b) => a.localeCompare(b));
+
+// Baseline gallery/image categories. Merged with whatever the existing listings
+// already use, so seeding never drops a category that is in the data.
+const DEFAULT_GALLERY_CATEGORIES = [
+  "Amenities",
+  "Exterior",
+  "Floor Plan",
+  "Interior",
+  "Location",
+  "Outdoor",
+  "Project Status",
+  "Site Plan",
+];
 
 async function initFirebase() {
   const keyPath = process.env.FIREBASE_SERVICE_ACCOUNT || resolve(__dirname, "../serviceAccountKey.json");
@@ -57,6 +70,10 @@ async function main() {
   const localities = uniqSorted([...locationOptions.filter((l) => l !== "Other"), ...properties.map((p) => p.locality)]);
   const amenities = uniqSorted(properties.flatMap((p) => p.amenities || []));
   const keyFeatures = uniqSorted(properties.flatMap((p) => p.keyFeatures || []));
+  const galleryCategories = uniqSorted([
+    ...DEFAULT_GALLERY_CATEGORIES,
+    ...properties.flatMap((p) => (p.gallery || []).map((g) => g.category)),
+  ]);
 
   await initFirebase();
   const db = getFirestore();
@@ -65,6 +82,7 @@ async function main() {
   await seedList(db, "localities", localities);
   await seedList(db, "amenities", amenities);
   await seedList(db, "keyFeatures", keyFeatures);
+  await seedList(db, "galleryCategories", galleryCategories);
 
   console.log("\nDone seeding reference lists.");
   process.exit(0);

@@ -41,6 +41,9 @@ service cloud.firestore {
     match /localities/{id}   { allow read: if true; allow write: if isAdmin(); }
     match /amenities/{id}    { allow read: if true; allow write: if isAdmin(); }
     match /keyFeatures/{id}  { allow read: if true; allow write: if isAdmin(); }
+    // Gallery image categories (Interior, Outdoor, Floor Plan …) — the public
+    // detail page groups gallery images by these, so it needs read access.
+    match /galleryCategories/{id} { allow read: if true; allow write: if isAdmin(); }
 
     // FAQs: fully public to read, admin-only to write.
     match /faqs/{id}         { allow read: if true; allow write: if isAdmin(); }

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { propertyCategoryOptions, configurationOptions } from "../../data/content";
 import { getNames, addListItem, propertyIdExists, LISTS } from "../../firebase/firestore";
-import ImageUploader, { GALLERY_TYPES } from "./ImageUploader";
+import ImageUploader, { GALLERY_TYPES, BROCHURE_TYPES } from "./ImageUploader";
 import AdminSelect from "./AdminSelect";
+import PropertyPreview from "./PropertyPreview";
 
 // --- Fixed enums (taxonomy mirrors src/data/properties.js) -------------------
 const CATEGORIES = ["residential", "commercial"];
@@ -42,6 +43,7 @@ const EMPTY = {
   videoUrl: "",
   configurations: [],
   gallery: [],
+  brochure: null, // {url, path, name, contentType} — downloadable PDF
   amenities: [],
   keyFeatures: [],
   towers: [],
@@ -54,6 +56,22 @@ const toNum = (v) => (v === "" || v == null ? undefined : Number(v));
 const stripUndefined = (obj) => Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
 const slugify = (s) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 const wordCount = (s) => (s.trim() ? s.trim().split(/\s+/).length : 0);
+
+/**
+ * Short, human-readable stand-in for a gallery item's URL. Firebase Storage
+ * URLs percent-encode the full object path, so decode it and keep the last
+ * segment — "properties%2Fgreen-legacy%2F123-mobile.jpg" → "123-mobile.jpg".
+ */
+const fileLabel = (g) => {
+  if (g.name) return g.name;
+  if (!g.url) return "no file";
+  try {
+    const path = decodeURIComponent(new URL(g.url).pathname);
+    return path.split("/").filter(Boolean).pop() || g.url;
+  } catch {
+    return g.url;
+  }
+};
 
 function Field({ label, error, children, wide }) {
   return (
@@ -69,9 +87,11 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel, onGa
   const isEdit = !!initial?.id;
   const [values, setValues] = useState(() => ({ ...EMPTY, ...(initial || {}), rera: { ...EMPTY.rera, ...(initial?.rera || {}) }, location: { ...EMPTY.location, ...(initial?.location || {}) } }));
   const [errors, setErrors] = useState({});
+  const [previewing, setPreviewing] = useState(false);
+  const [urlOpen, setUrlOpen] = useState({}); // gallery index → raw URL field revealed
 
   // Managed reference lists → dropdown options.
-  const [lists, setLists] = useState({ developers: [], localities: [], amenities: [], keyFeatures: [] });
+  const [lists, setLists] = useState({ developers: [], localities: [], amenities: [], keyFeatures: [], galleryCategories: [] });
   useEffect(() => {
     let active = true;
     Promise.all([
@@ -79,8 +99,9 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel, onGa
       getNames(LISTS.localities),
       getNames(LISTS.amenities),
       getNames(LISTS.keyFeatures),
-    ]).then(([developers, localities, amenities, keyFeatures]) => {
-      if (active) setLists({ developers, localities, amenities, keyFeatures });
+      getNames(LISTS.galleryCategories),
+    ]).then(([developers, localities, amenities, keyFeatures, galleryCategories]) => {
+      if (active) setLists({ developers, localities, amenities, keyFeatures, galleryCategories });
     });
     return () => { active = false; };
   }, []);
@@ -146,8 +167,47 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel, onGa
   // --- gallery --------------------------------------------------------------
   const onImageUploaded = ({ url, path, name, contentType }) =>
     setValues((v) => ({ ...v, gallery: [...v.gallery, { url, path, name, contentType, category: "", caption: "", tag: "" }] }));
-  const setGallery = (i, key, value) => set("gallery", values.gallery.map((g, idx) => (idx === i ? { ...g, [key]: value } : g)));
-  const removeGallery = (i) => set("gallery", values.gallery.filter((_, idx) => idx !== i));
+  // Functional update: the gallery category picker writes after an await, where
+  // a `values`-closure read could be stale.
+  const setGallery = (i, key, value) =>
+    setValues((v) => ({ ...v, gallery: v.gallery.map((g, idx) => (idx === i ? { ...g, [key]: value } : g)) }));
+  const removeGallery = (i) => {
+    set("gallery", values.gallery.filter((_, idx) => idx !== i));
+    // `urlOpen` is keyed by index, so a removal would otherwise leave the toggle
+    // attached to whichever card slid into that slot.
+    setUrlOpen({});
+  };
+
+  // The cover image is simply gallery[0] (both the admin grid and the public
+  // PropertyCard read it that way), so "make cover" moves the image to the
+  // front rather than introducing a separate coverUrl field to keep in sync.
+  const makeCover = (i) => {
+    if (i === 0) return;
+    setValues((v) => {
+      const next = [...v.gallery];
+      const [picked] = next.splice(i, 1);
+      return { ...v, gallery: [picked, ...next] };
+    });
+    setUrlOpen({});
+  };
+
+  // Image category is a managed list (Lists → Image Categories), with the same
+  // inline "+ Add new" affordance as the developer/locality dropdowns.
+  const handleGalleryCategory = async (i, val) => {
+    if (val === ADD_NEW) {
+      const name = window.prompt("New image category:")?.trim();
+      if (!name) return;
+      try {
+        await addListItem(LISTS.galleryCategories, name);
+        setLists((l) => ({ ...l, galleryCategories: [...l.galleryCategories, name].sort((a, b) => a.localeCompare(b)) }));
+        setGallery(i, "category", name);
+      } catch (err) {
+        alert(err.message || "Could not add.");
+      }
+      return;
+    }
+    setGallery(i, "category", val);
+  };
 
   // --- amenities / keyFeatures chip pickers ---------------------------------
   const addChip = (field, value) => { if (value && !values[field].includes(value)) set(field, [...values[field], value]); };
@@ -265,6 +325,14 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel, onGa
         .map((n) => stripUndefined({ label: n.label.trim(), category: n.category || "Landmark", distanceKm: toNum(n.distanceKm) })),
       amenities: values.amenities,
       keyFeatures: values.keyFeatures,
+      brochure: values.brochure?.url
+        ? stripUndefined({
+            url: values.brochure.url,
+            path: values.brochure.path || undefined,
+            name: values.brochure.name || undefined,
+            contentType: values.brochure.contentType || undefined,
+          })
+        : undefined,
       gallery: values.gallery.map((g) => stripUndefined({
         url: g.url, path: g.path || undefined, name: g.name || undefined, contentType: g.contentType || undefined,
         category: g.category || undefined, caption: g.caption || undefined, tag: g.tag || undefined,
@@ -299,6 +367,22 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel, onGa
     const status = action === "publish" ? "active" : action === "unpublish" ? "draft" : (isEdit ? values.status : "draft");
     onSubmit(id, buildData(status));
   };
+
+  // Preview renders the live public page off the *current* form state, so it
+  // reflects unsaved edits. `id` is only cosmetic here (preview mode never
+  // fetches or tracks), but keep it real when we have one.
+  if (previewing) {
+    return (
+      <PropertyPreview
+        property={{ id: values.id || "preview", ...buildData(values.status || "draft") }}
+        onClose={() => setPreviewing(false)}
+        publishing={saving}
+        // Publishing straight from preview only makes sense once the listing
+        // exists; new ones must be created as drafts first.
+        onPublish={isEdit ? () => { setPreviewing(false); submitForm("publish"); } : undefined}
+      />
+    );
+  }
 
   return (
     <form className="admin-form" onSubmit={(e) => { e.preventDefault(); submitForm(isEdit ? "save" : "create"); }} noValidate>
@@ -459,21 +543,136 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel, onGa
           onUploaded={onImageUploaded}
         />
         {errors.gallery && <p className="admin-field__err" style={{ margin: "10px 0 0" }}>{errors.gallery}</p>}
+        {values.gallery.length > 0 && (
+          <p className="admin-muted admin-form__hint admin-gallery__count">
+            {values.gallery.length} file{values.gallery.length === 1 ? "" : "s"} — the first one is used as the cover image.
+          </p>
+        )}
+        <div className="admin-gallery-grid">
         {values.gallery.map((g, i) => {
           const isImage = g.contentType ? g.contentType.startsWith("image/") : !/\.pdf$/i.test(g.url || "");
+          const showUrl = urlOpen[i];
           return (
-            <div key={i} className="admin-gallery-row">
-              {isImage && g.url
-                ? <img src={g.url} alt="" className="admin-gallery-thumb" />
-                : <span className="admin-file-chip"><i className="fa-solid fa-file" aria-hidden="true" /> {g.name || "file"}</span>}
-              <input type="url" value={g.url || ""} placeholder="File URL" onChange={(e) => setGallery(i, "url", e.target.value)} />
-              <input type="text" value={g.category || ""} placeholder="Category (e.g. Interior)" onChange={(e) => setGallery(i, "category", e.target.value)} />
-              <input type="text" value={g.caption || ""} placeholder="Caption" onChange={(e) => setGallery(i, "caption", e.target.value)} />
-              <input type="text" value={g.tag || ""} placeholder="Tag" onChange={(e) => setGallery(i, "tag", e.target.value)} />
-              <button type="button" className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => removeGallery(i)}>✕</button>
+            <div key={i} className="admin-gallery-card">
+              <div className="admin-gallery-card__media">
+                {isImage && g.url
+                  ? <img src={g.url} alt="" />
+                  : <span className="admin-gallery-card__file"><i className="fa-solid fa-file" aria-hidden="true" /></span>}
+                {i === 0 && <span className="admin-gallery-card__cover">Cover</span>}
+                {i !== 0 && isImage && (
+                  <button
+                    type="button"
+                    className="admin-gallery-card__setcover"
+                    onClick={() => makeCover(i)}
+                    title="Use this image as the cover"
+                  >
+                    <i className="fa-regular fa-star" aria-hidden="true" /> Make cover
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="admin-gallery-card__del"
+                  onClick={() => removeGallery(i)}
+                  aria-label={`Remove image ${i + 1}`}
+                  title="Remove"
+                >
+                  <i className="fa-solid fa-trash" aria-hidden="true" />
+                </button>
+              </div>
+
+              <div className="admin-gallery-card__body">
+                <label className="admin-gallery-card__field">
+                  <span>Category</span>
+                  <AdminSelect
+                    value={g.category || ""}
+                    onChange={(v) => handleGalleryCategory(i, v)}
+                    placeholder="Category…"
+                    options={[
+                      ...lists.galleryCategories.map((o) => ({ value: o, label: o })),
+                      // Keep a category already saved on this image selectable even
+                      // if it has since been removed from the managed list.
+                      ...(g.category && !lists.galleryCategories.includes(g.category)
+                        ? [{ value: g.category, label: g.category }]
+                        : []),
+                      { value: ADD_NEW, label: "+ Add new category…" },
+                    ]}
+                  />
+                </label>
+                <label className="admin-gallery-card__field">
+                  <span>Caption</span>
+                  <input type="text" value={g.caption || ""} placeholder="e.g. Grand entrance lobby" onChange={(e) => setGallery(i, "caption", e.target.value)} />
+                </label>
+                <label className="admin-gallery-card__field">
+                  <span>Tag</span>
+                  <input type="text" value={g.tag || ""} placeholder="e.g. Artistic Impression" onChange={(e) => setGallery(i, "tag", e.target.value)} />
+                </label>
+
+                {/* Storage URLs are long and almost never edited by hand, so the
+                    file name stands in for them until "edit" is clicked. */}
+                <div className="admin-gallery-card__url">
+                  <span className="admin-gallery-card__filename" title={g.url}>
+                    <i className="fa-regular fa-image" aria-hidden="true" /> {fileLabel(g)}
+                  </span>
+                  <button type="button" onClick={() => setUrlOpen((o) => ({ ...o, [i]: !o[i] }))}>
+                    {showUrl ? "done" : "edit"}
+                  </button>
+                </div>
+                {showUrl && (
+                  <input
+                    type="url"
+                    className="admin-gallery-card__urlinput"
+                    value={g.url || ""}
+                    placeholder="File URL"
+                    onChange={(e) => setGallery(i, "url", e.target.value)}
+                  />
+                )}
+              </div>
             </div>
           );
         })}
+        </div>
+      </section>
+
+      {/* --- Brochure --- */}
+      <section className="admin-form__section">
+        <h2 className="admin-form__legend">
+          Brochure <span className="admin-muted">(optional — PDF)</span>
+        </h2>
+        <p className="admin-muted admin-form__hint" style={{ margin: "0 0 12px" }}>
+          Visitors must submit an enquiry before the download starts.
+        </p>
+        {values.brochure?.url ? (
+          <div className="admin-brochure">
+            <i className="fa-solid fa-file-pdf admin-brochure__icon" aria-hidden="true" />
+            <a
+              className="admin-brochure__name"
+              href={values.brochure.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={values.brochure.url}
+            >
+              {values.brochure.name || fileLabel(values.brochure)}
+            </a>
+            <button
+              type="button"
+              className="admin-btn admin-btn--sm admin-btn--danger"
+              onClick={() => set("brochure", null)}
+            >
+              Remove
+            </button>
+          </div>
+        ) : (
+          <ImageUploader
+            folder="properties"
+            ownerId={values.id}
+            accept={BROCHURE_TYPES}
+            disabled={!isEdit}
+            disabledHint="Create the property first, then upload a brochure here."
+            onUploaded={({ url, path, name, contentType }) =>
+              set("brochure", { url, path, name, contentType })
+            }
+          />
+        )}
       </section>
 
       {/* --- Amenities & features --- */}
@@ -539,6 +738,9 @@ export default function PropertyForm({ initial, saving, onSubmit, onCancel, onGa
 
       <div className="admin-form__actions">
         <button type="button" className="admin-btn" onClick={onCancel} disabled={saving}>Cancel</button>
+        <button type="button" className="admin-btn" onClick={() => setPreviewing(true)} disabled={saving}>
+          <i className="fa-solid fa-eye" aria-hidden="true" /> Preview
+        </button>
         {isEdit && (values.status === "active" ? (
           <button type="button" className="admin-btn admin-btn--danger-solid" onClick={() => submitForm("unpublish")} disabled={saving}>
             <i className="fa-solid fa-eye-slash" aria-hidden="true" /> Unpublish

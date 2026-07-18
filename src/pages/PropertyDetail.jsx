@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, navigate } from "../router.jsx";
 import PropertyEnquiryForm from "../components/property/PropertyEnquiryForm";
 import PropertyLightbox from "../components/property/PropertyLightbox";
+import BrochureModal from "../components/property/BrochureModal";
 import SmartImage from "../components/SmartImage.jsx";
 import { track } from "../analytics";
+import { whatsappLink, CONTACT_PHONE } from "../data/content";
 import {
   getPropertyById,
   LISTING_TYPE_LABELS,
@@ -32,13 +34,25 @@ const FAQS = [
   },
 ];
 
-export default function PropertyDetail({ id }) {
-  const [property, setProperty] = useState(undefined); // undefined = loading, null = not found
+/**
+ * Public property page.
+ *
+ * Normally fetches by `id`. The admin preview passes an unsaved property object
+ * as `previewData` instead, which skips the fetch (there may be no document yet)
+ * and suppresses analytics and enquiry submission — see `preview`.
+ */
+export default function PropertyDetail({ id, previewData, preview = false }) {
+  const [property, setProperty] = useState(preview ? previewData : undefined); // undefined = loading, null = not found
   const [activeConfig, setActiveConfig] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null); // null = closed, number = open at index
+  const [brochureOpen, setBrochureOpen] = useState(false); // enquiry gate for the brochure PDF
   const [cmsFaqs, setCmsFaqs] = useState([]); // CMS-managed FAQs (fall back to the static list)
 
   useEffect(() => {
+    if (preview) {
+      setProperty(previewData);
+      return undefined;
+    }
     let active = true;
     setProperty(undefined);
     setLightboxIndex(null);
@@ -50,7 +64,7 @@ export default function PropertyDetail({ id }) {
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, preview, previewData]);
 
   // Load CMS FAQs on demand (keeps Firestore off this page's critical bundle).
   useEffect(() => {
@@ -90,6 +104,7 @@ export default function PropertyDetail({ id }) {
   // Open the fullscreen gallery at image `i` and log it.
   const openLightbox = (i) => {
     setLightboxIndex(i);
+    if (preview) return; // admin preview must not pollute analytics
     track("gallery_open", {
       property_id: property.id,
       image_index: i,
@@ -152,16 +167,49 @@ export default function PropertyDetail({ id }) {
                         {!isLand && <AreaRow label="Carpet area" value={c.carpetArea} unit={c.areaUnit} />}
                         {!isLand && c.usableArea ? <AreaRow label="Usable area" value={c.usableArea} unit={c.areaUnit} /> : null}
                       </dl>
-                      <button
-                        type="button"
-                        className="btn btn-outline prop-config__cta"
-                        onClick={() => {
-                          setActiveConfig(c.config);
-                          document.getElementById("enquire")?.scrollIntoView({ behavior: "smooth" });
-                        }}
-                      >
-                        Enquire Now
-                      </button>
+                      {/* Direct contact per configuration — the message/call is
+                          scoped to this specific unit type. */}
+                      <div className="prop-config__ctas">
+                        <a
+                          className="btn btn-outline prop-config__cta"
+                          href={`tel:${CONTACT_PHONE}`}
+                          aria-label={`Call about the ${c.config}`}
+                          title={`Call about the ${c.config}`}
+                          onClick={() => {
+                            setActiveConfig(c.config);
+                            if (preview) return;
+                            track("contact_click", {
+                              method: "phone",
+                              location: "property_config",
+                              property_id: property.id,
+                              configuration: c.config,
+                            });
+                          }}
+                        >
+                          <i className="fa-solid fa-phone" aria-hidden="true" />
+                        </a>
+                        <a
+                          className="btn btn-outline prop-config__cta prop-config__cta--wa"
+                          href={whatsappLink(
+                            `Hi Aagam Realty, I'm interested in the ${c.config} at ${property.title} (${property.locality}). Please share more details.`
+                          )}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Chat on WhatsApp about the ${c.config}`}
+                          title={`Chat on WhatsApp about the ${c.config}`}
+                          onClick={() => {
+                            setActiveConfig(c.config);
+                            if (preview) return;
+                            track("whatsapp_click", {
+                              location: "property_config",
+                              property_id: property.id,
+                              configuration: c.config,
+                            });
+                          }}
+                        >
+                          <i className="fa-brands fa-whatsapp" aria-hidden="true" />
+                        </a>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -299,7 +347,10 @@ export default function PropertyDetail({ id }) {
                     <div className="prop-nearby__card" key={n.label}>
                       <span className="prop-nearby__cat">{n.category}</span>
                       <span className="prop-nearby__label">{n.label}</span>
-                      <span className="prop-nearby__dist">{n.distanceKm} km</span>
+                      {/* Distance is optional — render nothing (not a bare "km"). */}
+                      {n.distanceKm != null && n.distanceKm !== "" && (
+                        <span className="prop-nearby__dist">{n.distanceKm} km</span>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -328,7 +379,26 @@ export default function PropertyDetail({ id }) {
           {/* ---- Sticky enquiry sidebar ---- */}
           <aside className="prop-detail__aside" id="enquire">
             <div className="prop-detail__sticky">
-              <PropertyEnquiryForm property={property} prefillConfig={activeConfig} />
+              {/* Brochure sits above the enquiry form because downloading it
+                  *is* an enquiry — saying so up front beats surprising the
+                  visitor with a form after they click. */}
+              {property.brochure?.url && (
+                <div className="prop-brochure-card">
+                  <i className="fa-solid fa-file-pdf prop-brochure-card__icon" aria-hidden="true" />
+                  <div className="prop-brochure-card__text">
+                    <strong>Project brochure</strong>
+                    <span>Share your details to download</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-primary prop-brochure-card__btn"
+                    onClick={() => setBrochureOpen(true)}
+                  >
+                    <i className="fa-solid fa-download" aria-hidden="true" /> Download
+                  </button>
+                </div>
+              )}
+              <PropertyEnquiryForm property={property} prefillConfig={activeConfig} preview={preview} />
             </div>
           </aside>
         </div>
@@ -346,6 +416,14 @@ export default function PropertyDetail({ id }) {
           title={property.title}
           startIndex={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
+        />
+      )}
+
+      {brochureOpen && property.brochure?.url && (
+        <BrochureModal
+          property={property}
+          preview={preview}
+          onClose={() => setBrochureOpen(false)}
         />
       )}
     </article>
@@ -409,25 +487,33 @@ function Gallery({ images = [], title, onOpen }) {
 }
 
 function CategoryGallery({ gallery, onOpen }) {
+  // Uncategorised images are common (the category field is optional), so drop
+  // blanks — otherwise `undefined` becomes an empty, unclickable tab pill.
   const categories = useMemo(
-    () => ["All", ...new Set(gallery.map((g) => g.category))],
+    () => ["All", ...new Set(gallery.map((g) => g.category?.trim()).filter(Boolean))],
     [gallery]
   );
   const [cat, setCat] = useState("All");
+  // The selected category can disappear (images edited/removed) — fall back to
+  // "All" rather than showing an empty grid.
+  const activeCat = categories.includes(cat) ? cat : "All";
   // Keep original global indices so a click opens the lightbox at the right image.
   const shown = gallery
     .map((g, index) => ({ ...g, index }))
-    .filter((g) => cat === "All" || g.category === cat);
+    .filter((g) => activeCat === "All" || g.category === activeCat);
 
   return (
     <div>
-      <div className="prop-gallery__tabs">
-        {categories.map((c) => (
-          <button key={c} type="button" className={`prop-tab${c === cat ? " active" : ""}`} onClick={() => setCat(c)}>
-            {c}
-          </button>
-        ))}
-      </div>
+      {/* With nothing but "All" there is nothing to filter — hide the row. */}
+      {categories.length > 1 && (
+        <div className="prop-gallery__tabs">
+          {categories.map((c) => (
+            <button key={c} type="button" className={`prop-tab${c === activeCat ? " active" : ""}`} onClick={() => setCat(c)}>
+              {c}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="prop-gallery__grid">
         {shown.map((g) => (
           <button
@@ -435,11 +521,14 @@ function CategoryGallery({ gallery, onOpen }) {
             className="prop-gallery__item"
             key={`${g.url}-${g.index}`}
             onClick={() => onOpen?.(g.index)}
-            aria-label={`View ${g.caption || g.category}`}
+            aria-label={`View ${g.caption || g.category || `image ${g.index + 1}`}`}
           >
-            <SmartImage src={g.url} alt={g.caption || g.category} />
+            <SmartImage src={g.url} alt={g.caption || g.category || ""} />
             <span className="prop-gallery__zoom" aria-hidden="true"><i className="fa-solid fa-magnifying-glass-plus" /></span>
-            <span className="prop-gallery__cap">{g.caption || g.category}</span>
+            {/* Skip the caption bar entirely when there is no text for it. */}
+            {(g.caption || g.category) && (
+              <span className="prop-gallery__cap">{g.caption || g.category}</span>
+            )}
           </button>
         ))}
       </div>

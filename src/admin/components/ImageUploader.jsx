@@ -23,6 +23,9 @@ export const GALLERY_TYPES = [
   { ext: ".heif", mime: "image/heif" },
 ];
 
+// Property brochure: a single downloadable PDF.
+export const BROCHURE_TYPES = [{ ext: ".pdf", mime: "application/pdf" }];
+
 const DEFAULT_MAX_BYTES = 10 * 1024 * 1024; // 10 MB
 
 /**

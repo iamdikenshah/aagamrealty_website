@@ -268,7 +268,7 @@
 .admin-field > span { font-weight: 600; color: var(--charcoal); }
 .admin-field--wide { grid-column: 1 / -1; }
 .admin-field input, .admin-field select, .admin-field textarea,
-.admin-subfield input, .admin-inline-row input, .admin-gallery-row input {
+.admin-subfield input, .admin-inline-row input, .admin-gallery-card input {
   padding: 9px 11px; border: 1px solid #d3dae8; border-radius: var(--radius-sm);
   font: inherit; font-size: 0.9rem; background: var(--white); color: var(--charcoal); width: 100%;
 }
@@ -341,9 +341,75 @@
 
 .admin-subrow { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; padding: 12px 0; border-bottom: 1px solid var(--light-gray); }
 .admin-subfield { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; flex: 1 1 110px; }
-.admin-gallery-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--light-gray); }
-.admin-gallery-row input { flex: 1 1 140px; }
-.admin-gallery-thumb { width: 54px; height: 40px; object-fit: cover; border-radius: 6px; }
+/* --- Gallery editor: one card per image ------------------------------------- */
+.admin-gallery__count { margin: 14px 0 10px; }
+
+.admin-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.admin-gallery-card {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--light-gray); border-radius: var(--radius);
+  background: var(--white); overflow: hidden;
+}
+
+.admin-gallery-card__media { position: relative; aspect-ratio: 4 / 3; background: var(--light-gray); }
+.admin-gallery-card__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.admin-gallery-card__file { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--gray); font-size: 1.6rem; }
+
+.admin-gallery-card__cover {
+  position: absolute; top: 8px; left: 8px;
+  background: rgba(31, 41, 51, 0.85); color: #fff;
+  font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase;
+  border-radius: 999px; padding: 3px 9px;
+}
+
+.admin-gallery-card__del {
+  position: absolute; top: 8px; right: 8px;
+  width: 28px; height: 28px; border: none; border-radius: 50%;
+  background: rgba(31, 41, 51, 0.75); color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 0.75rem;
+  opacity: 0; transition: opacity 0.15s ease, background 0.15s ease;
+}
+.admin-gallery-card:hover .admin-gallery-card__del,
+.admin-gallery-card__del:focus-visible { opacity: 1; }
+.admin-gallery-card__del:hover { background: #c0392b; }
+/* Touch devices have no hover, so keep the control permanently visible. */
+@media (hover: none) { .admin-gallery-card__del { opacity: 1; } }
+
+.admin-gallery-card__setcover {
+  position: absolute; left: 8px; bottom: 8px;
+  border: none; border-radius: 999px; cursor: pointer;
+  background: rgba(31, 41, 51, 0.75); color: #fff;
+  font-size: 0.7rem; font-weight: 600; padding: 4px 10px;
+  display: inline-flex; align-items: center; gap: 5px;
+  opacity: 0; transition: opacity 0.15s ease, background 0.15s ease;
+}
+.admin-gallery-card:hover .admin-gallery-card__setcover,
+.admin-gallery-card__setcover:focus-visible { opacity: 1; }
+.admin-gallery-card__setcover:hover { background: var(--purple); }
+@media (hover: none) { .admin-gallery-card__setcover { opacity: 1; } }
+
+.admin-gallery-card__body { display: flex; flex-direction: column; gap: 8px; padding: 12px; }
+.admin-gallery-card__field { display: flex; flex-direction: column; gap: 4px; }
+.admin-gallery-card__field > span { font-size: 0.72rem; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.03em; }
+.admin-gallery-card__field input { width: 100%; }
+
+.admin-gallery-card__url {
+  display: flex; align-items: center; gap: 6px;
+  border-top: 1px solid var(--light-gray); padding-top: 8px; margin-top: 2px;
+  font-size: 0.75rem; color: var(--gray);
+}
+.admin-gallery-card__filename { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-gallery-card__url button {
+  border: none; background: none; padding: 0; cursor: pointer;
+  color: var(--purple); font: inherit; text-decoration: underline; flex: none;
+}
+.admin-gallery-card__urlinput { width: 100%; font-size: 0.78rem !important; }
 
 .admin-form__actions {
   display: flex; gap: 10px; justify-content: flex-end;
@@ -615,10 +681,12 @@
 }
 
 .admin-prop-card__actions {
-  display: flex; gap: 8px; align-items: center;
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
   padding: 14px 16px; margin-top: 12px; border-top: 1px solid var(--light-gray);
 }
-.admin-prop-card__actions .admin-btn:first-child { flex: 1; justify-content: center; }
+/* Edit and Preview share the leading space; publish + delete keep their width. */
+.admin-prop-card__actions .admin-btn:first-child,
+.admin-prop-card__preview { flex: 1; justify-content: center; }
 .admin-prop-card__del { margin-left: auto; }
 
 /* --- Empty state ------------------------------------------------------------ */
@@ -807,4 +875,128 @@
   .admin-hero__actions { width: 100%; }
   .admin-hero__actions .admin-btn { flex: 1; }
   .admin-enq__time { margin-left: 0; width: 100%; }
+}
+
+/* ===================== PROPERTY JSON IMPORT ===================== */
+
+.admin-page-head__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.admin-import__drop {
+  background: var(--white);
+  border: 2px dashed var(--light-gray);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.admin-import__drop > i { font-size: 2rem; color: var(--gray); display: block; margin-bottom: 12px; }
+.admin-import__drop p { margin: 0 0 16px; color: var(--gray); }
+.admin-import__file { margin: 12px 0 0; font-size: 0.85rem; }
+
+.admin-import__summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.admin-import__list { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 10px; }
+
+.admin-import__item {
+  background: var(--white);
+  border: 1px solid var(--light-gray);
+  border-left: 3px solid #1e7d3c;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.admin-import__item.is-invalid { border-left-color: #c0392b; }
+.admin-import__item.is-skipped { opacity: 0.55; }
+
+.admin-import__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.admin-import__pick { flex: 1 1 240px; margin: 0; }
+.admin-import__title { font-weight: 600; }
+
+.admin-import__id {
+  font-size: 0.75rem;
+  color: var(--gray);
+  background: var(--light-gray);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-left: 8px;
+}
+
+.admin-import__msgs { margin: 10px 0 0; padding-left: 20px; font-size: 0.85rem; color: var(--gray); }
+.admin-import__msgs li { margin-bottom: 4px; }
+.admin-import__msgs--err { color: #c0392b; }
+.admin-import__msgs--warn { color: #a5731a; }
+
+.admin-import__done { color: #1e7d3c; font-weight: 600; }
+.admin-import__report { background: var(--white); border-radius: var(--radius); padding: 20px; }
+
+/* ===================== PROPERTY PREVIEW OVERLAY ===================== */
+/* Full-screen stage that renders the real public PropertyDetail page. The
+   public styles (index.css) are loaded app-wide, so nothing is re-declared
+   here — this only provides the chrome around the page. */
+
+.admin-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+}
+
+.admin-preview__bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  background: #1f2933;
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.admin-preview__label { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; flex-wrap: wrap; }
+.admin-preview__label > i { opacity: 0.75; }
+
+.admin-preview__warn {
+  background: #a5731a;
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.admin-preview__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* The preview bar sits on a dark strip, so its buttons need light styling. */
+.admin-preview__actions .admin-btn { background: rgba(255, 255, 255, 0.12); color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+.admin-preview__actions .admin-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.22); }
+.admin-preview__actions .admin-btn--success { background: #1e7d3c; border-color: #1e7d3c; }
+
+.admin-preview__stage { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+
+@media (max-width: 640px) {
+  .admin-preview__bar { padding: 10px 14px; }
+  .admin-preview__label { font-size: 0.8rem; }
+  .admin-preview__actions { width: 100%; }
+  .admin-preview__actions .admin-btn { flex: 1; }
+}
+
+/* --- Brochure (single PDF per property) ------------------------------------- */
+.admin-brochure {
+  display: flex; align-items: center; gap: 12px;
+  border: 1px solid var(--light-gray); border-radius: var(--radius);
+  background: var(--white); padding: 12px 14px;
+}
+.admin-brochure__icon { font-size: 1.5rem; color: #c0392b; flex: none; }
+.admin-brochure__name {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: var(--charcoal); font-size: 0.9rem; font-weight: 500;
 }

@@ -319,7 +319,17 @@
 .prop-config__area { display: flex; justify-content: space-between; font-size: 14px; }
 .prop-config__area dt { color: var(--gray); }
 .prop-config__area dd { font-weight: 600; color: var(--charcoal); }
-.prop-config__cta { width: 100%; min-height: 42px; padding: 9px 16px; font-size: 15px; }
+/* Two icon-only CTAs per configuration: Call + WhatsApp. Square tap targets,
+   right-aligned so the card doesn't read as one giant button bar. */
+.prop-config__ctas { display: flex; gap: 10px; justify-content: flex-end; }
+.prop-config__cta {
+  width: 46px; height: 46px; flex: none; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 18px; line-height: 1; text-decoration: none;
+}
+.prop-config__cta i { margin: 0; }
+.prop-config__cta--wa { color: #128c7e; border-color: #128c7e; }
+.prop-config__cta--wa:hover { background: #128c7e; color: var(--white); }
 
 /* Tables */
 .prop-table-scroll { overflow-x: auto; }
@@ -517,14 +527,14 @@
 .prop-map__foot .btn { white-space: nowrap; }
 
 /* Nearby */
-.prop-nearby { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.prop-nearby { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 .prop-nearby__card {
-  display: flex; flex-direction: column; gap: 4px; padding: 16px;
+  display: flex; flex-direction: column; gap: 2px; padding: 12px 14px;
   border: 1px solid var(--light-gray); border-radius: var(--radius); background: var(--white);
 }
-.prop-nearby__cat { font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--purple); font-weight: 500; }
+.prop-nearby__cat { font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--purple); font-weight: 500; }
 .prop-nearby__label { font-size: 15px; color: var(--charcoal); font-weight: 600; }
-.prop-nearby__dist { font-size: 14px; color: var(--gray); }
+.prop-nearby__dist { font-size: 13px; color: var(--gray); }
 
 /* RERA */
 .prop-rera {
@@ -662,3 +672,51 @@
   .prop-listing__head { flex-direction: column; align-items: stretch; }
   .prop-listing__filter-toggle { justify-content: center; }
 }
+
+/* --- Brochure download (enquiry-gated) -------------------------------------- */
+/* Brochure card — sits above the enquiry form in the sticky sidebar. */
+.prop-brochure-card {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 14px 16px; margin-bottom: 16px;
+  background: var(--white); border: 1px solid var(--light-gray);
+  border-radius: var(--radius); box-shadow: var(--shadow-sm);
+}
+.prop-brochure-card__icon { font-size: 26px; color: #c0392b; flex: none; }
+.prop-brochure-card__text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.prop-brochure-card__text strong { font-size: 15px; color: var(--charcoal); }
+.prop-brochure-card__text span { font-size: 13px; color: var(--gray); }
+.prop-brochure-card__btn {
+  flex: none; min-height: 40px; padding: 8px 16px; font-size: 14px;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+/* Narrow sidebar / mobile: let the button take the full width below the text. */
+@media (max-width: 420px) {
+  .prop-brochure-card__btn { width: 100%; justify-content: center; }
+}
+
+.prop-brochure__overlay {
+  position: fixed; inset: 0; z-index: 1200;
+  background: rgba(15, 20, 30, 0.6);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; overflow-y: auto;
+}
+
+.prop-brochure__modal {
+  position: relative; width: 100%; max-width: 440px;
+  background: var(--white); border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-height: 100%; overflow-y: auto;
+}
+/* The enquiry form supplies its own padding/among the modal. */
+.prop-brochure__modal .prop-enquiry { margin: 0; box-shadow: none; border: none; }
+
+.prop-brochure__close {
+  position: absolute; top: 10px; right: 10px; z-index: 1;
+  width: 32px; height: 32px; border: none; border-radius: 50%;
+  background: rgba(15, 20, 30, 0.07); color: var(--charcoal);
+  cursor: pointer; font-size: 0.95rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.prop-brochure__close:hover { background: rgba(15, 20, 30, 0.14); }
+
+.prop-brochure__dl { margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; }

@@ -8,6 +8,7 @@ const TABS = [
   { coll: LISTS.localities, label: "Localities", singular: "locality" },
   { coll: LISTS.amenities, label: "Amenities", singular: "amenity" },
   { coll: LISTS.keyFeatures, label: "Key Features", singular: "key feature" },
+  { coll: LISTS.galleryCategories, label: "Image Categories", singular: "image category" },
 ];
 
 export default function ListsManager() {

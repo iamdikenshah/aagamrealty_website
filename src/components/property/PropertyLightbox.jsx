@@ -17,20 +17,29 @@ export default function PropertyLightbox({ gallery, title, startIndex = 0, onClo
   const [current, setCurrent] = useState(startIndex);
   const activeThumbRef = useRef(null);
 
+  // The category field is optional, but this view *groups and navigates* by it —
+  // so uncategorised images need a real bucket rather than an `undefined` key,
+  // which would render as an empty, unlabelled tab.
+  const UNCATEGORISED = "Other";
+  const items = useMemo(
+    () => gallery.map((g) => ({ ...g, cat: g.category?.trim() || UNCATEGORISED })),
+    [gallery]
+  );
+
   // Ordered, de-duplicated list of categories with per-category counts.
   const categories = useMemo(() => {
     const map = new Map();
-    gallery.forEach((g) => map.set(g.category, (map.get(g.category) || 0) + 1));
+    items.forEach((g) => map.set(g.cat, (map.get(g.cat) || 0) + 1));
     return [...map.entries()].map(([name, count]) => ({ name, count }));
-  }, [gallery]);
+  }, [items]);
 
-  const active = gallery[current] || gallery[0];
-  const activeCat = active?.category;
+  const active = items[current] || items[0];
+  const activeCat = active?.cat;
 
   // Global indices of the images in the currently-active category, in order.
   const catIndices = useMemo(
-    () => gallery.map((g, i) => (g.category === activeCat ? i : -1)).filter((i) => i >= 0),
-    [gallery, activeCat]
+    () => items.map((g, i) => (g.cat === activeCat ? i : -1)).filter((i) => i >= 0),
+    [items, activeCat]
   );
   const posInCat = catIndices.indexOf(current);
 
@@ -44,7 +53,7 @@ export default function PropertyLightbox({ gallery, title, startIndex = 0, onClo
   );
 
   const selectCategory = (name) => {
-    const first = gallery.findIndex((g) => g.category === name);
+    const first = items.findIndex((g) => g.cat === name);
     if (first >= 0) setCurrent(first);
   };
 
@@ -112,7 +121,7 @@ export default function PropertyLightbox({ gallery, title, startIndex = 0, onClo
         <figure className="prop-lightbox__figure">
           <div className="prop-lightbox__imgwrap">
             <span className="prop-lightbox__imgbox">
-              <img src={active.url} alt={active.caption || active.category} />
+              <img src={active.url} alt={active.caption || active.cat} />
               {active.tag && <span className="prop-lightbox__tag">{active.tag}</span>}
             </span>
           </div>
@@ -132,10 +141,10 @@ export default function PropertyLightbox({ gallery, title, startIndex = 0, onClo
       </div>
 
       <div className="prop-lightbox__thumbs">
-        {gallery.map((g, gi) => {
+        {items.map((g, gi) => {
           const isActive = gi === current;
           // Mark the start of each category group so the strip reads as sections.
-          const isGroupStart = gi === 0 || gallery[gi - 1].category !== g.category;
+          const isGroupStart = gi === 0 || items[gi - 1].cat !== g.cat;
           return (
             <button
               key={`${g.url}-${gi}`}
@@ -143,8 +152,8 @@ export default function PropertyLightbox({ gallery, title, startIndex = 0, onClo
               ref={isActive ? activeThumbRef : null}
               className={`prop-lightbox__thumb${isActive ? " active" : ""}${isGroupStart && gi !== 0 ? " group-start" : ""}`}
               onClick={() => setCurrent(gi)}
-              aria-label={g.caption || g.category}
-              title={`${g.category}${g.caption ? " · " + g.caption : ""}`}
+              aria-label={g.caption || g.cat}
+              title={`${g.cat}${g.caption ? " · " + g.caption : ""}`}
             >
               <SmartImage src={g.url} alt="" />
             </button>

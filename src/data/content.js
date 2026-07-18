@@ -206,6 +206,9 @@ export const GOOGLE_FORM = {
 
 export const WHATSAPP_NUMBER = "919227100299";
 
+/** E.164 number for `tel:` links. Same line as WhatsApp. */
+export const CONTACT_PHONE = "+919227100299";
+
 /** Build a wa.me deep-link that pre-fills the chat with `text`. */
 export const whatsappLink = (text) =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;

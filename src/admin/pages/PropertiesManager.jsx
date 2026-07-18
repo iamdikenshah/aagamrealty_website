@@ -7,6 +7,8 @@ import {
 } from "../../firebase/firestore";
 import { formatPriceRange } from "../../data/properties";
 import PropertyForm from "../components/PropertyForm";
+import PropertyImport from "../components/PropertyImport";
+import PropertyPreview from "../components/PropertyPreview";
 import SmartImage from "../../components/SmartImage.jsx";
 
 const STATUS_LABELS = {
@@ -27,7 +29,11 @@ const FILTERS = [
 export default function PropertiesManager() {
   const [items, setItems] = useState(null);
   const [error, setError] = useState("");
-  const [editing, setEditing] = useState(null); // null = list; {} = new; {id,...} = edit
+  // null = list; {} = new; {id,...} = edit an existing doc;
+  // {__prefill:data} = new listing pre-filled from an imported JSON record.
+  const [editing, setEditing] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const [previewing, setPreviewing] = useState(null); // property being previewed from the grid
   const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
@@ -130,7 +136,37 @@ export default function PropertiesManager() {
     return list;
   }, [items, filter, query]);
 
+  if (previewing) {
+    const isDraft = (previewing.status || "active") !== "active";
+    return (
+      <PropertyPreview
+        property={previewing}
+        onClose={() => setPreviewing(null)}
+        // Only offer Publish for drafts — for a live listing the button would
+        // really mean "unpublish", which belongs on the card, not in preview.
+        onPublish={isDraft ? async () => { await togglePublish(previewing); setPreviewing(null); } : undefined}
+      />
+    );
+  }
+
+  if (importing) {
+    return (
+      <PropertyImport
+        onClose={() => setImporting(false)}
+        onImported={load}
+        onEditRecord={(r) => {
+          // Hand the record to the normal form as a *new* listing (no id), so it
+          // goes through create + the form's own validation before it is stored.
+          setImporting(false);
+          setEditing({ __prefill: r.data });
+        }}
+      />
+    );
+  }
+
   if (editing !== null) {
+    // A pre-filled record has no id yet, so the form still runs in "create" mode.
+    const formInitial = editing.id ? editing : editing.__prefill || null;
     return (
       <div>
         <div className="admin-page-head">
@@ -138,7 +174,7 @@ export default function PropertiesManager() {
           <button className="admin-btn" onClick={() => setEditing(null)}>Cancel</button>
         </div>
         <PropertyForm
-          initial={editing.id ? editing : null}
+          initial={formInitial}
           saving={saving}
           onSubmit={handleSave}
           onCancel={() => setEditing(null)}
@@ -152,9 +188,14 @@ export default function PropertiesManager() {
     <div>
       <div className="admin-page-head">
         <h1 className="admin-h1">Properties</h1>
-        <button className="admin-btn admin-btn--primary" onClick={() => setEditing({})}>
-          <i className="fa-solid fa-plus" aria-hidden="true" /> New property
-        </button>
+        <div className="admin-page-head__actions">
+          <button className="admin-btn" onClick={() => setImporting(true)}>
+            <i className="fa-solid fa-file-arrow-up" aria-hidden="true" /> Import JSON
+          </button>
+          <button className="admin-btn admin-btn--primary" onClick={() => setEditing({})}>
+            <i className="fa-solid fa-plus" aria-hidden="true" /> New property
+          </button>
+        </div>
       </div>
 
       {error && <p className="admin-error">{error}</p>}
@@ -250,6 +291,13 @@ export default function PropertiesManager() {
                 <div className="admin-prop-card__actions">
                   <button className="admin-btn admin-btn--sm" onClick={() => setEditing(p)}>
                     <i className="fa-solid fa-pen" aria-hidden="true" /> Edit
+                  </button>
+                  <button
+                    className="admin-btn admin-btn--sm admin-prop-card__preview"
+                    onClick={() => setPreviewing(p)}
+                    title={`Preview ${p.title} as it appears on the site`}
+                  >
+                    <i className="fa-solid fa-eye" aria-hidden="true" /> Preview
                   </button>
                   {published ? (
                     <button className="admin-btn admin-btn--sm admin-btn--danger-solid" onClick={() => togglePublish(p)}>
