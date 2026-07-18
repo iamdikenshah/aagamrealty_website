@@ -116,7 +116,17 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="footer-bottom">&copy; 2026 Aagam Realty. All rights reserved.</div>
+      <div className="footer-bottom">
+        <span>&copy; 2026 Aagam Realty. All rights reserved.</span>
+        <span className="footer-legal">
+          <Link to="/terms" onClick={() => track("footer_link_click", { label: "Terms & Conditions" })}>
+            Terms &amp; Conditions
+          </Link>
+          <Link to="/privacy" onClick={() => track("footer_link_click", { label: "Privacy Policy" })}>
+            Privacy Policy
+          </Link>
+        </span>
+      </div>
     </footer>
   );
 }

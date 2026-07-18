@@ -1255,10 +1255,33 @@ section { padding: 72px 0; }
 
 .footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 22px 0;
-  text-align: center;
   font-size: 14px;
   color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 22px 24px;
+}
+
+.footer-legal {
+  display: inline-flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.footer-legal a { color: rgba(255, 255, 255, 0.7); }
+
+.footer-legal a:hover {
+  color: var(--white);
+  text-decoration: underline;
+}
+
+@media (min-width: 640px) {
+  .footer-bottom { justify-content: space-between; }
 }
 
 /* ===================== FLOATING WHATSAPP BUTTON ===================== */

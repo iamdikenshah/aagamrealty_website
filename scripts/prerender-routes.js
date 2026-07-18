@@ -37,6 +37,24 @@ const ROUTES = [
     ogDescription:
       "Share your property requirement — rent, buy, pre-lease or plots in Ahmedabad — and Aagam Realty will get back to you.",
   },
+  {
+    path: "terms",
+    title: "Terms & Conditions — Aagam Realty",
+    description:
+      "The terms and conditions governing the use of the Aagam Realty website and enquiry service.",
+    ogTitle: "Terms & Conditions — Aagam Realty",
+    ogDescription:
+      "The terms governing use of the Aagam Realty website and enquiry service.",
+  },
+  {
+    path: "privacy",
+    title: "Privacy Policy — Aagam Realty",
+    description:
+      "How Aagam Realty collects, uses, and protects your personal data, and your rights under the Digital Personal Data Protection Act, 2023.",
+    ogTitle: "Privacy Policy — Aagam Realty",
+    ogDescription:
+      "How Aagam Realty collects, uses, and protects your personal data.",
+  },
 ];
 
 // Replace the `content="..."` (or href) of a tag matched by `attr="value"`.

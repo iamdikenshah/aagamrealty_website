@@ -13,6 +13,8 @@ import WhatsAppFloat from "./components/WhatsAppFloat";
 import PropertyShowcase from "./components/property/PropertyShowcase";
 import PropertiesList from "./pages/PropertiesList";
 import PropertyDetail from "./pages/PropertyDetail";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import { useLocation, navigate } from "./router.jsx";
 import { openEnquiry } from "./enquiryStore";
 import { trackPageView } from "./analytics";
@@ -85,6 +87,8 @@ function Router() {
     if (!id) return <Redirect to="/properties" />;
     return <PropertyDetail id={id} />;
   }
+  if (path === "/terms" || path === "/terms/") return <Terms />;
+  if (path === "/privacy" || path === "/privacy/") return <Privacy />;
   if (path === "/" || path === "") return <Home />;
   // Shared enquiry link — render the homepage underneath; App opens the enquiry
   // modal on top and normalises the URL back to "/".
